@@ -124,7 +124,20 @@ body{background:linear-gradient(145deg,#FFF1F8,#FFF9F3 60%,#FCE3EF);}
 .add-btn{background:#EA2E8C;color:white}.progress-fill{background:#EA2E8C}
 input,textarea,select{color-scheme:light}
 @media(min-width:700px){#app{max-width:690px}.main{padding:0 24px 24px}.nav{max-width:690px}}
-.compass-text{line-height:1.8;font-size:14px;min-height:180px;white-space:pre-wrap;resize:vertical}.nav-item{padding:8px 5px;flex:1}.nav-item .emoji{font-size:17px}details.card summary{list-style:none}details.card summary::-webkit-details-marker{display:none}
+
+/* Add-ons retain the original Becoming OS visual language. */
+.nav-item{flex:1;padding:8px 3px;min-width:0}
+.compass-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:14px}
+.compass-tab{border:1px solid var(--border);background:var(--surface2);border-radius:12px;padding:12px 10px;text-align:left;min-height:65px}
+.compass-tab.active{background:#FFF0F7;border-color:var(--rose);box-shadow:0 0 0 1px #FAD4E7}
+.compass-tab small{display:block;color:var(--muted);font-size:11px;margin-bottom:4px}
+.compass-tab strong{font-size:12px;line-height:1.4}
+.compass-reading{white-space:pre-wrap;line-height:1.85;font-size:14px}
+.compass-edit{min-height:250px;line-height:1.7}
+.compass-details{border:1px solid var(--border);background:var(--surface);border-radius:14px;padding:14px}
+.compass-details summary{cursor:pointer;font-weight:600}
+.learning-checks{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
+.learning-checks label{font-size:13px}
 </style>
 </head>
 <body>
@@ -171,43 +184,131 @@ function getWeekNumber(dateStr){ const monday=getMonday(dateStr); const diff=Mat
 function getWeekRotation(wn){ return { biweeklyOn: mod(wn,2)===0, outreachWoman: mod(wn,4)===0, outreachMan: mod(wn,4)===2 }; }
 function escapeHtml(str){ return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 
+const IDENTITY_SECTIONS=[{"title": "My Spiritual Identity", "body": "I am a daughter of God, firmly rooted in Christ. I know whose I am, and I do not need to perform to earn my place in His love. I am called to intimacy with God, not merely religious activity. My life is an invitation for Christ to be seen and known.\n\nI am a priest in my family: I intercede, I stand in the gap, and I lead by the example of a life surrendered to God. I carry the Holy Spirit, and I make room for His wisdom, correction, and power. My words carry weight because I choose truth, prayer, and integrity. I am protected, guided, favored, and graced for the assignments entrusted to me.\n\nI do not mistake spiritual authority for control over people. I walk in courage and humility. I cultivate a living relationship with God, study His Word, obey what I learn, and trust Him with what I cannot control. I am a catalyst for deeper intimacy with Christ in my home and wherever I am sent. My mind, character, and results increasingly reflect Him."}, {"title": "My Inner World", "body": "I am secure in who I am. My worth is not measured by my bank balance, appearance, achievements, attention, or anybody’s approval. I can enjoy beautiful things and build wealth without using them to prove that I matter.\n\nI trust myself to notice what I feel, examine what I think, and make thoughtful decisions. I do not rush to defend my value or explain myself to everyone. I can be misunderstood without losing my center. I am emotionally regulated: I pause, discern, respond, and repair when I am wrong.\n\nI am both soft and strong. I know how to rest without guilt and work without panic. I release comparison, unnecessary pressure, and the urge to announce every move. I keep my own counsel, honor my boundaries, and let consistent action speak. I am becoming a woman whose peace comes from alignment, not from managing everybody’s opinion."}, {"title": "My Femininity & Presence", "body": "I am a powerhouse clothed in grace. My femininity is not performance, helplessness, or silence. It is a confident, grounded expression of the woman God made me to be.\n\nI am warm, bubbly, lighthearted, and kind. I bring joy into rooms without shrinking myself. I carry myself with elegance, dignity, and self-respect. I speak clearly, listen attentively, and make people feel seen while remaining discerning about access to me.\n\nI take pleasure in caring for my body and environment. My hygiene, health, grooming, wardrobe, and personal style express stewardship and delight, not desperation for validation. I dress with creativity and intention; I am free to become a fashion icon in my own distinctive way.\n\nI can be gracious and assertive at the same time. I say no without hostility, ask for what I need without apology, and receive compliments, generosity, and care without suspicion. My presence is memorable because it is genuine."}, {"title": "My Mind & Character", "body": "I am a woman of substance. I read widely, think critically, ask better questions, and put what I learn into practice. Knowledge is not decoration; it shapes my judgment, conversations, habits, and decisions.\n\nI communicate with clarity and precision. I do not use unnecessary words to prove intelligence. I am willing to learn, admit uncertainty, reconsider an opinion, and take correction without collapsing into shame. I build self-trust by keeping promises to myself and acting on sound judgment.\n\nI am courageous in uncomfortable conversations. I am assertive without aggression, gentle without passivity, and confident without arrogance. I recognize manipulation, maintain healthy boundaries, and choose integrity even when shortcuts are available.\n\nI value my name and reputation. I am meticulous about the quality of my work, fair in my dealings, generous where I can be, and accountable for the impact of my choices. My growth is visible in how I behave, not only in what I study."}, {"title": "My Purpose, Work & Abundance", "body": "I create value and multiply it. My work is a place to serve people with excellence, build lasting relationships, and steward opportunities wisely. I do not chase money at the expense of character, but I do not apologize for wanting financial abundance.\n\nIn real estate, I understand what I sell, communicate its value honestly, and serve intentional, financially capable buyers and investors with confidence. I cultivate strong relationships, follow through on commitments, negotiate clearly, and measure outcomes rather than confusing busyness with progress.\n\nI build my businesses with structure, creativity, discipline, and sound judgment. I learn the numbers, respect my time, delegate wisely, and make decisions from evidence rather than fear. I can earn well, travel, shop, invest, enjoy beauty, and live generously without letting possessions define me.\n\nLike Joseph, I want my growth to lift my family and create opportunities for others. Wealth is a tool for freedom, stewardship, and service. I trust God with the outcome while taking responsibility for the work in front of me."}, {"title": "My Love & Relationships", "body": "I am wise, openhearted, and cherished. I can love deeply without abandoning myself. I bring kindness, joy, honesty, and emotional maturity into my relationships, and I expect mutual respect.\n\nI am discerning about trust. I do not confuse attention with commitment, chemistry with character, or access with intimacy. I protect my peace and honor my boundaries. I do not entertain disrespect, unwanted sexual comments, or relationships that compromise my values.\n\nI am open to an intentional, affectionate, generous romantic relationship with a man who delights in caring for me and treats me tenderly. I can receive love, thoughtful gifts, and being spoiled without making them the measure of my worth. I also show up with care, wisdom, loyalty, and clear communication.\n\nI nurture family and friendships with presence and generosity. I communicate directly instead of testing people, and I choose repair when it is healthy. I remain whole whether I am alone or accompanied."}, {"title": "The Life I Live", "body": "I walk in alignment. My relationship with God, inner security, health, work, relationships, and joy belong to one life; they are not competing performances.\n\nI make room for prayer, learning, meaningful work, laughter, beauty, movement, and rest. I do not need to prove that I am constantly productive. I enjoy the present while building the future. I keep my routines sustainable, my promises realistic, and my priorities visible.\n\nI am a woman who travels, explores, dresses beautifully, earns with integrity, gives generously, and takes excellent care of herself. I have the wisdom to distinguish what matters from what merely looks impressive. I am free to change course when new evidence or new responsibilities require it.\n\nMy life is not a collection of declarations alone. Every day I embody them through one honest decision, one courageous conversation, one act of discipline, one boundary kept, or one kindness offered. I do my part with excellence and leave the rest to God. I am becoming who I say I am."}];
+
+const COMPASS_DEFAULTS={
+  why: "I want to honor God with my life, deepen my intimacy with Him, and make Christ known through my character. I want to elevate my family as Joseph did, create opportunities for people I am called to help, and enjoy a beautiful, abundant life without confusing wealth with worth.",
+  priorities: "1. God and my spiritual formation\n2. Purpose and meaningful work\n3. My health, character, security, and personal growth\n4. Family and friendships\n5. People I am called to serve and help",
+  values: "1. God is involved in every area of my life.\n2. The Bible is my foundation for truth.\n3. Growth means applying what I learn.\n4. I communicate clearly and respectfully.\n5. I cultivate self-trust and sound judgment.\n6. I choose a constructive perspective.\n7. I practice courage.\n8. I depend on the power of the Holy Spirit.\n9. I lead with kindness and love.\n10. I act with integrity in business.\n11. I protect my good name.\n12. I show up with confidence.\n13. I am generous and responsible.",
+  boundaries: "1. I do not entertain sexual advances or sexual jokes from people outside my romantic relationship.\n2. I maintain approximately two feet of personal space where appropriate.\n3. I do not hold hands casually.\n4. I walk away from disrespect rather than arguing for basic dignity.\n5. Business meetings need a clear objective.\n6. I do not enter romantic relationships with business partners.\n7. I do not share personal items outside my family.\n8. I do not overshare plans or progress before they are established.\n9. I lend money no more than once per month, and only when I can afford it."
+};
+let compassSelected=new Date().getDay();
+let compassEdit=false;
+function identityBody(i){return data.compass.sections?.[i] ?? IDENTITY_SECTIONS[i].body;}
+function saveIdentityBody(i,v){data.compass.sections ||= {};data.compass.sections[i]=v;saveData();}
+function chooseIdentity(i){compassSelected=i;compassEdit=false;render();}
+function editIdentity(){compassEdit=!compassEdit;render();}
+function saveCompassField(key,v){data.compass[key]=v;saveData();}
+function renderCompass(){
+ const i=compassSelected, title=IDENTITY_SECTIONS[i].title;
+ const dayLabels=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+ return `<div class="card card-gold">
+  <p class="serif" style="font-size:23px;margin:0 0 7px">My Compass 🧭</p>
+  <p class="muted text-sm" style="line-height:1.6;margin:0">Your identity, values and boundaries — a private place to return to what matters.</p>
+ </div>
+ <div class="card">
+  <div class="row between"><div><p class="serif font-semibold" style="font-size:19px;margin:0">✨ My Identity</p><p class="muted text-xs" style="margin:5px 0">One declaration each day · read morning and night</p></div><span style="font-size:24px">🌸</span></div>
+  <div class="compass-tabs">${IDENTITY_SECTIONS.map((x,n)=>`<button class="compass-tab ${i===n?'active':''}" onclick="chooseIdentity(${n})" aria-pressed="${i===n}"><small>${dayLabels[n]}</small><strong>${escapeHtml(x.title)}</strong></button>`).join('')}</div>
+ </div>
+ <div class="card">
+  <div class="row between" style="align-items:flex-start;gap:10px">
+    <div><p class="muted text-xs" style="margin:0 0 5px">${dayLabels[i]} · Declaration ${i+1} of 7</p><p class="serif font-semibold" style="font-size:20px;margin:0 0 12px">${escapeHtml(title)}</p></div>
+    <button class="icon-btn" style="border:1px solid var(--border);width:auto;padding:0 12px;font-size:12px" onclick="editIdentity()">${compassEdit?'Done':'Edit'}</button>
+  </div>
+  ${compassEdit?`<textarea class="compass-edit" oninput="saveIdentityBody(${i},this.value)">${escapeHtml(identityBody(i))}</textarea>`:`<div class="compass-reading">${escapeHtml(identityBody(i))}</div>`}
+ </div>
+ <div class="card"><p class="serif font-semibold" style="font-size:17px;margin:0 0 6px">The foundations 🌷</p><p class="muted text-xs" style="margin:0">Open a section to read or edit it.</p>
+ ${[['why','🔥 My Why'],['priorities','🎯 My Priorities'],['values','💎 My Values'],['boundaries','🛡️ My Boundaries']].map(([key,label])=>`<details class="compass-details" style="margin-top:10px"><summary>${label}</summary><textarea class="compass-edit" style="margin-top:12px;min-height:160px" oninput="saveCompassField('${key}',this.value)">${escapeHtml(data.compass[key]??COMPASS_DEFAULTS[key])}</textarea></details>`).join('')}
+ </div>`;
+}
+
 /* ===================== BECOMING ROUTINE ===================== */
 const task=(id,label,time,category,section,extra={})=>({id,label,time,category,section,...extra});
 const DAY=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
 const scheduleStart='2026-10-18';
 function everyN(date,anchor,n){let a=parseISO(anchor), b=parseISO(date);return b>=a&&Math.round((b-a)/86400000)%n===0;}
 function dailyCore(day,date){
- const x=[], add=(id,label,time,category='growth',section='growth',extra={})=>x.push(task(id,label,time,category,section,extra));
- const sun=day===0, course=date>='2026-10-20'&&date<='2026-12-18', exam=date>='2026-12-19'&&date<='2027-01-17';
- add('wake-pray','Wake, hydrate & connect with God','Morning · flexible','faith','morning');
- add('oral-am','Morning hygiene & self-care','Morning','light','morning');
- add('bible-1','Bible reading and reflection','Morning','faith','morning');
- add('identity-morning','Say today’s identity declaration','Morning · '+IDENTITY_DAYS[day].title,'faith','morning');
- if(sun){
-  add('rest','Protected rest and worship','Sunday · no business quota','rest','growth');
-  add('weekly-reflection','Gentle weekly reflection','Optional 10–15 minutes','rest','evening',{optional:true});
- } else {
-  if(day===1){add('crm','Real estate · CRM and pipeline','Focus block · 3 hours');}
-  if(day===2){add('crm','Real estate · follow-ups','Focus block · 1 hour');add('light-content','Light Gallery · marketing, content & ads','Focus block · 2½ hours','light');}
-  if(day===3){add('crm','Real estate · sales and relationships','Focus block · 2 hours');add('maintenance','Maintenance partnership · planning','Focus block · 1 hour');}
-  if(day===4){add('re-content','Real estate · record videos & follow up','Focus block · 1½ hours');add('light-content','Light Gallery · content batching & scheduling','Focus block · 2½ hours','light');}
-  if(day===5){add('crm','Real estate · conversions and CRM','Focus block · 2½ hours');add('light-sales','Light Gallery · sales check','30 minutes','light');}
-  if(day===6){add('crm-week','Real estate · weekly pipeline review','45 minutes');add('maintenance','Maintenance partnership · planning','1 hour');add('light-review','Light Gallery · weekly review','45 minutes','light');}
-  if(course){
-   const count=[0,2,1,1,2,1,1][day];
-   for(let i=1;i<=count;i++)add('sermon-'+i,'Compulsory Sermon Project · '+i+' of '+count,'60–90+ minutes · listen attentively','faith');
-   if([1,3,5,6].includes(day))add('prayer-block','Foundation School · prayer block','Up to 2 hours · log actual minutes','faith');
-   if([2,3,5,6].includes(day))add('optional-sermon','Optional curriculum-map sermon','Only if capacity allows','faith','growth',{optional:true});
-  }
-  if(exam)add('exam-prep','Foundation School · exam preparation','Focused review · flexible','faith');
-  add('german','German practice','10 minutes · optional','growth','growth',{optional:true});
+ const office=[1,3,5].includes(day),sun=day===0,thu=day===4;
+ const x=[
+ task('wake-pray','Wake, hydrate & pray','6:00am · water first','faith','morning'),
+ task('meditation-am','Morning meditation','Gentle start · flexible','faith','morning'),
+ task('affirm-6','Say today’s identity declaration','Morning · '+IDENTITY_SECTIONS[day].title,'faith','morning'),
+ task('ginger','Ginger shot','Morning · daily','light','morning'),
+ task('eggs','Two eggs + nourishing breakfast','Morning','light','morning'),
+ task('supplements','Morning supplements','Calcium+C · D+K · omega 3-6-9 · B complex','light','morning'),
+ task('oral-am','Morning oral-care ritual','Oil pull → brush → water floss → tongue scrape → mouthwash','light','morning'),
+ ];
+ if(office) x.push(task('bible-1','Bible reading · 1 of 3','20 minutes · morning','faith','morning'));
+ else x.push(task('bible-1','Bible reading · 1 of 2','30 minutes · morning','faith','morning'));
+ if([3,0].includes(day))x.push(task('fast','Fast · 6am–1pm','Only when medically well enough; take supplements with food as advised','faith','morning'));
+
+
+
+ // Business blocks — one primary focus per session, no invented clock commitments.
+ if(day===1)x.push(task('estate-mon','Real estate · CRM and pipeline','3 hours · review leads, qualify prospects and plan follow-ups','growth','growth',{featured:true}));
+ if(day===2)x.push(task('estate-tue','Real estate · follow-ups','1 hour · contact warm leads','growth','growth'));
+ if(day===3)x.push(task('estate-wed','Real estate · sales and relationships','2 hours · prospect and build relationships','growth','growth',{featured:true}));
+ if(day===4){
+   x.push(task('estate-thu','Real estate · follow-ups','1.5 hours · progress conversations','growth','growth'));
+   x.push(task('estate-video','Record real-estate video','Film only · editing and posting delegated','growth','growth'));
  }
- add('reading','Read and nourish my mind','Evening · flexible','growth','evening',{optional:true});
- add('identity-evening','Say today’s identity declaration','Night · '+IDENTITY_DAYS[day].title,'faith','evening');
- add('night-wind-down','Nighttime Wind-Down (Shower & Hygiene)','Evening · shower, body care and oral hygiene','rest','evening');
- add('gratitude-journal','Gratitude Journal','Evening · reflect on what went well','rest','evening');
- add('sleep','Rest and sleep','Protect sufficient sleep','rest','evening');
- return x;
+ if(day===5)x.push(task('estate-fri','Real estate · conversion and CRM','2.5 hours · close open loops and update pipeline','growth','growth',{featured:true}));
+ if(day===6)x.push(task('estate-sat','Real estate · weekly pipeline review','45 minutes · plan next week','growth','growth'));
+ if([2,4].includes(day))x.push(task('light-focus','Light Gallery · content, sales and ads','2.5 hours · create, post, manage ads and enquiries','light','growth',{featured:true}));
+ if(day===5)x.push(task('light-check','Light Gallery · sales check','30 minutes · orders and follow-ups','light','growth'));
+ if(day===6)x.push(task('light-review','Light Gallery · weekly review','45 minutes · sales and next steps','light','growth'));
+ if([3,6].includes(day))x.push(task('maintenance-plan','Maintenance partnership · development','1 hour · planning and outreach','growth','growth'));
+ x.push(task('german','German practice','10 minutes · flexible','growth','growth',{optional:true}));
+ x.push(task('work-location',office?'Office day':(sun?'Sunday rest':'Work from home'),'Mon/Wed/Fri office · Tue/Thu WFH unless meetings','growth','growth',{optional:true}));
+ if(office)x.push(task('gospel-video','Record gospel & identity TikTok','At the office · optional','identity','growth',{optional:true}));
+ if(office)x.push(task('bible-2','Bible reading · 2 of 3','20 minutes · afternoon','faith','growth'));
+ if(day===2)x.push(task('family','Family connection','Tuesday evening · 15–20 minutes','rest','evening'));
+ if(day===6){
+ x.push(task('book-check','Monthly book progress','Read one book per month · no need to rush','growth','evening',{optional:true}));
+ x.push(task('sanitation','Saturday sanitation & personal care','Clean bathroom · body scrub · shave · reset','light','growth'));
+ x.push(task('crm-week','CRM review & next-week call plan','Saturday night · no outreach','growth','evening'));
+ 
+ x.push(task('wind-down-week','Wind down for Sunday rest','Saturday night','rest','evening'));
+ }
+ if(sun){
+ x.push(task('rest','Protected Sunday rest','No real-estate calls or work tasks','rest','growth'));
+ x.push(task('prayer-friend','Prayer with friend','2:00–4:00pm','faith','growth'));
+ if(everyN(date,'2026-11-01',14))x.push(task('swim','Swimming for enjoyment','Every other Sunday · arrange outside 2–4pm prayer','rest','growth'));
+ if(everyN(date,'2026-10-18',21))x.push(task('solo-date','Solo outing / drinks','Sunday evening · every 3 weeks','rest','evening'));
+ x.push(task('weekly-reflection','Weekly emotional reflection','During Sunday walk · no pressure','rest','evening'));
+ }
+ if(everyN(date,'2026-10-16',14)&&day===5)x.push(task('fruit-shop','Buy fruit for the next two weeks','Friday · pineapple / apple / seasonal fruit','light','growth'));
+ if(everyN(date,'2026-10-17',28)&&day===6)x.push(task('grooming','Hair, lashes & nails appointment','Every four weeks · flexible weekend slot','rest','growth'));
+ if(date==='2026-12-18')x.push(task('travel-purchase','Travel preparation · purchase reminder','Physician’s Choice digestive enzymes and 60 Billion probiotic · check suitability with clinician','light','growth'));
+
+ if(date>='2026-10-20'&&date<='2026-12-18'){
+   const sermonCount=[0,2,1,1,2,1,1][day];
+   if(sermonCount)x.push(task('course-sermons','Spiritual course · '+sermonCount+' compulsory sermon'+(sermonCount===1?'':'s'),'Sermon Project · 62 compulsory over first 60 days','faith','growth'));
+   if([1,3,5,6].includes(day))x.push(task('course-prayer','Spiritual course · focused prayer','2 hours · work toward 60 hours in 60 days','faith','growth'));
+   if([2,3,5,6].includes(day))x.push(task('course-optional','Optional Curriculum Map sermon','Only when you have capacity','faith','growth',{optional:true}));
+ }
+ if(date>='2026-12-19'&&date<='2027-01-17'&&day!==0)x.push(task('course-exam','Spiritual course · exam preparation','Final 30 days · study and revise','faith','growth'));
+ if(date.startsWith('2026-10')&&day===6)x.push(task('swimming-lessons','October swimming lesson','Add your booked lesson time; only attend when well','rest','growth',{optional:true}));
+ if(everyN(date,'2026-10-17',14)&&day===6)x.push(task('friendship','Friendship check-in','Every other Saturday · flexible','rest','evening'));
+ if(day===5)x.push(task('boyfriend','Relationship conversation with boyfriend','Friday night · set phone alarm for Saturday 12:00am','rest','evening'));
+ if(!office)x.push(task('bible-2','Bible reading · 2 of 2','30 minutes · later in day','faith','evening'));
+ else x.push(task('bible-3','Bible reading · 3 of 3','20 minutes · evening','faith','evening'));
+ x.push(task('spontaneous-prayer','Spontaneous prayer / speak with God','Anytime · no fixed quota','faith','evening',{optional:true}));
+ x.push(task('shadow-work','Open existing shadow-work diary','Only when helpful · do not duplicate journal','rest','evening',{optional:true}));
+ x.push(task('future-script','Open existing future-self scripting diary','Optional reflection · separate from audio journal','rest','evening',{optional:true}));
+ x.push(task('affirm-19','Say today’s identity declaration','Night · '+IDENTITY_SECTIONS[day].title,'faith','evening'));
+
+ x.push(task('fruit-drink','Fresh blended fruit drink','Every other day · rotate available fruit','light','evening',{alternate:true}));
+ x.push(task('reading','Read a book','20 minutes · night wind-down','growth','evening'));
+ if([2,4,0].includes(day))x.push(task('walk','Contemplative prayer walk','8:30pm · phone-free estate walk','faith','evening'));
+ x.push(task('sunday-joy', 'Unstructured enjoyment','Rest and pleasure are allowed · no quota','rest','evening',{optional:true}));
+ x.push(task('oral-pm','Evening oral-care ritual','Oil pull → brush → water floss → tongue scrape → mouthwash','light','evening'));
+ x.push(task('gratitude-journal','Gratitude Journal','A few things I am grateful for today','rest','evening',{optional:true}));
+ x.push(task('night-hygiene','Nighttime Wind-Down (Shower & Hygiene)','Shower, personal hygiene and prepare for rest','light','evening'));
+ x.push(task('audio-journal','Audio journal','Anytime · ideally before bed','rest','evening'));
+ x.push(task('sleep','Sleep routine','11:30pm bedtime goal · 6am wake is 6½h; aim for more rest when possible','rest','evening'));
+ if(everyN(date,'2026-10-18',7)&&sun)x.push(task('joy-moment','Add a moment to your Joy Jar','Photo / memory / gratitude · optional','rest','evening',{optional:true}));
+ return x.filter(t=>!t.biweekly && (!t.alternate || Math.round((parseISO(date)-parseISO('2026-10-14'))/86400000)%2===0));
 }
 function getTasksForDay(dayIndex,dateStr){return dailyCore(dayIndex,dateStr);}
 /* ===================== APP DATA ===================== */
@@ -236,14 +337,17 @@ function loadData(){
 function saveData(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){} }
 
 let data = loadData();
-function initializeOS(){
- data.days ||= {}; data.finance ||= {personal:[],estate:[],light:[]}; data.checkins ||= {};
- data.checkins[todayISO()]=true;
- data.inbox ||= []; data.weekNotes ||= {}; data.outcomes ||= {}; data.compass ||= {};
- data.modes ||= {}; data.taskDecisions ||= {};
- saveData();
+function ensureExtras(){
+ data.checkins ||= {};
+ data.compass ||= {};
+ data.videoWeeks ||= {};
+ data.weekReviews ||= {};
+ data.taskRecovery ||= {};
+ data.finance ||= {personal:[],estate:[],light:[]};
+ const today=todayISO();
+ if(!data.checkins[today]){data.checkins[today]=true;saveData();}
 }
-initializeOS();
+ensureExtras();
 let activeTab='today';
 let selectedDate=todayISO();
 let collapsedSections={};
@@ -343,11 +447,13 @@ function applyRestoredData(jsonString){
     if(!parsed||typeof parsed!=='object') throw new Error('bad');
     const defaults=getDefaultData();
     data = {
+      checkins:parsed.checkins||{}, compass:parsed.compass||{}, videoWeeks:parsed.videoWeeks||{}, weekReviews:parsed.weekReviews||{}, taskRecovery:parsed.taskRecovery||{},
       days: parsed.days&&typeof parsed.days==='object'?parsed.days:{},
       weekly: parsed.weekly&&typeof parsed.weekly==='object'?parsed.weekly:{},
       goals: Object.assign({}, defaults.goals, parsed.goals||{}), finance:parsed.finance||{personal:[],estate:[],light:[]},joy:parsed.joy||[],
     };
     importText='';
+    ensureExtras();
     saveData();
     render();
     const s=document.getElementById('backup-status');
@@ -452,22 +558,8 @@ function renderToday(){
       <textarea class="input" rows="4" placeholder="How did today go?" oninput="updateJournal(this.value)">${escapeHtml(dayData.journal||'')}</textarea>
     </div>`;
 
-  return renderDailyTools()+html;
+  return html;
 }
-
-
-function updatePriorities(v){ensureDay(selectedDate).priorities=v;saveData();}
-function captureInbox(){const e=document.getElementById('capture-input');if(!e||!e.value.trim())return;data.inbox.push({id:Date.now(),text:e.value.trim(),date:todayISO(),status:'inbox'});saveData();render();}
-function inboxAction(id,action){const x=data.inbox.find(x=>x.id===id);if(!x)return;if(action==='today'){ensureDay(todayISO()).custom.push({id:'inbox-'+id,text:x.text,done:false});x.status='scheduled';}else x.status=action;saveData();render();}
-function toggleLightDay(){data.modes[selectedDate]=!data.modes[selectedDate];saveData();render();}
-function recoverTask(date,id,action){data.taskDecisions[date]||={};data.taskDecisions[date][id]=action;if(action==='reschedule'){const label=getTasksForDay(parseISO(date).getDay(),date).find(t=>t.id===id)?.label||id;const next=addDays(todayISO(),1);ensureDay(next).custom.push({id:'recovery-'+Date.now()+'-'+id,text:'Carry-over: '+label,done:false});}saveData();render();}
-function saveWeekNote(monday,value){data.weekNotes[monday]=value;saveData();}
-function saveOutcome(monday,kind,value){data.outcomes[monday]||={};data.outcomes[monday][kind]=value;saveData();}
-function weekReport(monday){const end=addDays(monday,6),last=end<todayISO()?end:addDays(todayISO(),-1);let total=0,done=0,by={};for(let d=monday;d<=last;d=addDays(d,1)){const t=getTasksForDay(parseISO(d).getDay(),d).filter(x=>!x.optional);const dd=data.days[d]||{};for(const x of t){const decision=data.taskDecisions[d]?.[x.id];if(decision==='skip'||decision==='cancel')continue;total++;by[x.category]||={total:0,done:0};by[x.category].total++;if(dd.tasks?.[x.id]){done++;by[x.category].done++;}}for(const c of dd.custom||[]){total++;done+=Number(!!c.done);}}return {total,done,pct:total?Math.round(done/total*100):null,by};}
-function checkinStreak(){const dates=Object.keys(data.checkins||{}).filter(k=>data.checkins[k]).sort();const set=new Set(dates);let d=todayISO(),current=0;if(!set.has(d))d=addDays(d,-1);while(set.has(d)){current++;d=addDays(d,-1);}let longest=0,run=0,prev='';for(const x of dates){run=prev&&addDays(prev,1)===x?run+1:1;longest=Math.max(longest,run);prev=x;}return {current,longest,days:dates.length};}
-function renderDailyTools(){const dd=ensureDay(selectedDate),light=!!data.modes[selectedDate];return `<div class="card"><p class="serif font-semibold">🎯 Today's Top 3</p><p class="muted text-xs">Three outcomes, not another long to-do list.</p><textarea rows="3" placeholder="1. …&#10;2. …&#10;3. …" oninput="updatePriorities(this.value)">${escapeHtml(dd.priorities||'')}</textarea><button class="input" style="margin-top:10px" onclick="toggleLightDay()">${light?'✓ Minimum-Viable Day ON · switch off':'🌿 Switch to Minimum-Viable Day'}</button>${light?'<p class="muted text-xs">Focus on one essential business action, one spiritual commitment, and evening care. Your other tasks remain available.</p>':''}</div><div class="card"><p class="serif font-semibold">📥 Quick Capture</p><div class="add-row"><input class="input" id="capture-input" placeholder="Capture a task or idea…" onkeydown="if(event.key==='Enter')captureInbox()"><button class="add-btn" onclick="captureInbox()">+</button></div><p class="muted text-xs">${data.inbox.filter(x=>x.status==='inbox').length} items waiting · manage in Week</p></div>`;}
-function renderReview(){const prev=addDays(getMonday(todayISO()),-7),report=weekReport(prev),hist=[];for(let i=7;i>=0;i--){const m=addDays(getMonday(todayISO()),-7*i),r=weekReport(m);hist.push(`<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--border)"><span>${shortDate(m)}</span><strong>${r.pct===null?'No data':r.pct+'%'}</strong></div>`);}const misses=[];for(let d=prev;d<=addDays(prev,6);d=addDays(d,1)){const dd=data.days[d]||{};for(const t of getTasksForDay(parseISO(d).getDay(),d).filter(x=>!x.optional&&!dd.tasks?.[x.id]&&!data.taskDecisions[d]?.[x.id]))misses.push({d,t});}
-return `<div class="card"><p class="serif font-semibold">📊 Last week's performance</p><p class="text-xl serif">${report.pct===null?'No recorded activity':report.pct+'% completion'}</p><p class="muted text-xs">${report.done}/${report.total} scheduled activities · week of ${shortDate(prev)}. A score measures activity, not personal worth.</p>${Object.entries(report.by).map(([k,v])=>`<p class="text-sm">${escapeHtml(k)} · ${v.done}/${v.total}</p>`).join('')}<p class="serif font-semibold">Results beyond activity</p>${[['leads','Qualified leads / follow-ups converted'],['sales','Sales / deals closed'],['prayer','Prayer hours completed'],['sermons','Compulsory sermons completed']].map(([k,l])=>`<label class="text-xs muted">${l}<input class="input" type="number" min="0" step="any" value="${escapeHtml(data.outcomes[prev]?.[k]??'')}" oninput="saveOutcome('${prev}','${k}',this.value)"></label>`).join('')}<p class="serif font-semibold">Weekly reflection</p><textarea rows="3" placeholder="What worked? What needs to change?" oninput="saveWeekNote('${prev}',this.value)">${escapeHtml(data.weekNotes[prev]||'')}</textarea></div><div class="card"><p class="serif font-semibold">📈 Weekly history</p>${hist.join('')}</div><div class="card"><p class="serif font-semibold">↪ Missed-task recovery</p><p class="muted text-xs">Choose deliberately. Reschedule adds a task to tomorrow.</p>${misses.slice(0,18).map(({d,t})=>`<div style="padding:9px 0;border-bottom:1px solid var(--border)"><p class="text-sm" style="margin:0 0 6px">${shortDate(d)} · ${escapeHtml(t.label)}</p><div class="row gap2">${['reschedule','skip','cancel'].map(a=>`<button class="chip" style="background:var(--surface2)" onclick="recoverTask('${d}','${t.id}','${a}')">${a}</button>`).join('')}</div></div>`).join('')||'<p class="muted text-xs">No unresolved tasks from last week.</p>'}</div><div class="card"><p class="serif font-semibold">📥 Capture inbox</p>${data.inbox.filter(x=>x.status==='inbox').map(x=>`<div style="padding:10px 0"><p class="text-sm">${escapeHtml(x.text)}</p><div class="row gap2"><button class="chip" style="background:var(--surface2)" onclick="inboxAction(${x.id},'today')">Add to today</button><button class="chip" style="background:var(--surface2)" onclick="inboxAction(${x.id},'archived')">Archive</button></div></div>`).join('')||'<p class="muted text-xs">Inbox clear.</p>'}</div>`;}
 
 /* ===================== RENDER: WEEK ===================== */
 function renderOutputRow(monday,key,meta,value){
@@ -501,15 +593,122 @@ function renderRotationCard(monday){
       <p class="muted text-xs" style="margin:8px 0 0;">Rotates on its own — these show up on Sat/Sun when it's their week. Nothing to track.</p>
     </div>`;
 }
-function weeklyAchievement(date){const days=Array.from({length:7},(_,i)=>addDays(getMonday(date),i));const ids=['crm','re-content','light-content','maintenance','sermon-1','prayer-block'];return ids.map(id=>{let target=0,done=0;for(const d of days){if(getTasksForDay(parseISO(d).getDay(),d).some(t=>t.id===id)){target++;done+=Number(!!data.days[d]?.tasks?.[id]);}}return [id.replace(/-/g,' '),done,target];}).filter(x=>x[2]);}
+function weeklyAchievement(date){
+ const days=Array.from({length:7},(_,i)=>addDays(getMonday(date),i));
+ const completed=(d,id)=>!!data.days?.[d]?.tasks?.[id];
+ const sets=[
+  ['🏡 Real estate', [['estate-mon',1],['estate-tue',2],['estate-wed',3],['estate-thu',4],['estate-video',4],['estate-fri',5],['estate-sat',6]]],
+  ['💡 Light Gallery', [['light-focus',2],['light-focus',4],['light-check',5],['light-review',6]]],
+  ['🏢 Maintenance partnership', [['maintenance-plan',3],['maintenance-plan',6]]],
+  ['🙏 Spiritual coursework', [['course-sermons',1],['course-sermons',2],['course-sermons',3],['course-sermons',4],['course-sermons',5],['course-sermons',6],['course-prayer',1],['course-prayer',3],['course-prayer',5],['course-prayer',6]]]
+ ];
+ return sets.map(([name,pairs])=>{
+   const relevant=pairs.filter(([id,day])=>getTasksForDay(day,days[day===0?6:day-1]).some(t=>t.id===id));
+   return [name,relevant.filter(([id,day])=>completed(days[day===0?6:day-1],id)).length,relevant.length];
+ });
+}
 function renderWeek(){
  const monday=getMonday(selectedDate), days=Array.from({length:7},(_,i)=>addDays(monday,i));
  const stats=days.map(d=>computeDayStats(d,data));
- const avg=Math.round(stats.reduce((n,s)=>n+s.pct,0)/7);
- return renderReview()+`<div class="card"><p class="serif" style="font-size:22px;margin:0 0 8px">Your week in bloom 🌷</p><p class="muted text-sm" style="margin:0">Week of ${shortDate(monday)} · ${avg}% average completion</p><div class="progress" style="margin-top:14px"><div class="progress-fill" style="width:${avg}%;background:${COLORS.rose}"></div></div></div>
+ const recorded=days.filter(d=>d<=todayISO()&&data.days?.[d]);
+ const avg=recorded.length?Math.round(recorded.reduce((n,d)=>n+computeDayStats(d,data).pct,0)/recorded.length):0;
+ return `<div class="card"><p class="serif" style="font-size:22px;margin:0 0 8px">Your week in bloom 🌷</p><p class="muted text-sm" style="margin:0">Week of ${shortDate(monday)} · ${avg}% average completion</p><div class="progress" style="margin-top:14px"><div class="progress-fill" style="width:${avg}%;background:${COLORS.rose}"></div></div></div>
  <div class="week-grid">${days.map((d,i)=>`<button class="week-day ${d===selectedDate?'active':''}" onclick="jumpToDay('${d}')"><span class="text-xs">${dayName(d).slice(0,3)}</span><span class="mini-orb" style="background:conic-gradient(${COLORS.rose} ${stats[i].pct*3.6}deg,${COLORS.surface2} 0deg)"><span class="mini-orb-inner"></span></span><span class="text-xs">${shortDate(d).split(' ')[1]}</span></button>`).join('')}</div>
  <div class="card"><p class="serif font-semibold">Weekly goals · automatically tracked</p>${weeklyAchievement(selectedDate).map(([name,done,target])=>`<div style="margin:12px 0"><div class="row between text-sm"><span>${name}</span><strong>${done}/${target}</strong></div><div class="progress"><div class="progress-fill" style="width:${Math.min(100,done/target*100)}%;background:${COLORS.rose}"></div></div></div>`).join('')}</div>
- <div class="card"><p class="serif font-semibold">Your rhythm this week</p>${days.map((d,i)=>`<div class="row between" style="padding:9px 0;border-bottom:1px solid ${COLORS.border}"><span>${dayName(d)} · ${stats[i].done}/${stats[i].total}</span><span style="color:${COLORS.rose};font-weight:600">${stats[i].pct}%</span></div>`).join('')}</div>`;
+ <div class="card"><p class="serif font-semibold">Your rhythm this week</p>${days.map((d,i)=>`<div class="row between" style="padding:9px 0;border-bottom:1px solid ${COLORS.border}"><span>${dayName(d)} · ${stats[i].done}/${stats[i].total}</span><span style="color:${COLORS.rose};font-weight:600">${stats[i].pct}%</span></div>`).join('')}</div>${renderWeekExtras()}`;
+}
+
+
+function checkinStats(){
+ const keys=Object.keys(data.checkins||{}).sort(), set=new Set(keys);
+ let current=0,d=todayISO();
+ while(set.has(d)){current++;d=addDays(d,-1);}
+ if(current===0){d=addDays(todayISO(),-1);while(set.has(d)){current++;d=addDays(d,-1);}}
+ let longest=0,run=0,prev='';
+ keys.forEach(k=>{run=prev&&addDays(prev,1)===k?run+1:1;longest=Math.max(longest,run);prev=k;});
+ return {current,longest};
+}
+function weekReport(monday){
+ const days=Array.from({length:7},(_,i)=>addDays(monday,i));
+ let done=0,total=0;
+ const categories={};
+ for(const date of days){
+  if(date>todayISO())continue;
+  const d=data.days?.[date];
+  if(!d)continue;
+  for(const t of getTasksForDay(parseISO(date).getDay(),date)){
+   if(t.optional||data.taskRecovery?.[date]?.[t.id]==='skip')continue;
+   total++;categories[t.category]||={done:0,total:0};categories[t.category].total++;
+   if(d.tasks?.[t.id]){done++;categories[t.category].done++;}
+  }
+  for(const t of d.custom||[]){total++;if(t.done)done++;}
+ }
+ return {done,total,pct:total?Math.round(100*done/total):0,categories};
+}
+function saveWeekNote(monday,v){data.weekReviews[monday]=v;saveData();}
+function markRecovered(date,id,action){
+ data.taskRecovery[date] ||= {};
+ data.taskRecovery[date][id]=action;
+ saveData();render();
+}
+function renderWeekExtras(){
+ const monday=getMonday(selectedDate),prior=addDays(monday,-7);
+ const report=weekReport(prior);
+ const recent=Array.from({length:8},(_,i)=>addDays(prior,-7*i));
+ const missed=[];
+ for(let n=1;n<=7;n++){
+  const date=addDays(todayISO(),-n),d=data.days?.[date];
+  if(!d)continue;
+  getTasksForDay(parseISO(date).getDay(),date).forEach(t=>{
+   if(!t.optional&&!d.tasks?.[t.id]&&!data.taskRecovery?.[date]?.[t.id]&&missed.length<8)missed.push({date,t});
+  });
+ }
+ return `<div class="card">
+ <p class="serif font-semibold" style="font-size:18px;margin:0 0 6px">Last week's reflection 🌷</p>
+ <p class="muted text-xs">Week of ${shortDate(prior)} · recorded tasks only</p>
+ <p class="serif" style="font-size:25px;color:${COLORS.rose};margin:6px 0">${report.pct}% <span class="muted text-xs">${report.done}/${report.total} completed</span></p>
+ ${Object.entries(report.categories).map(([key,v])=>`<div class="row between text-xs" style="padding:5px 0"><span>${escapeHtml(CATEGORY_META[key]?.label||key)}</span><strong>${v.done}/${v.total}</strong></div>`).join('')}
+ <p class="muted text-xs" style="margin-top:12px">What worked, what was difficult, and what will you adjust?</p>
+ <textarea rows="4" placeholder="A short, honest weekly review..." oninput="saveWeekNote('${prior}',this.value)">${escapeHtml(data.weekReviews[prior]||'')}</textarea>
+ </div>
+ <div class="card"><p class="serif font-semibold" style="font-size:17px;margin:0 0 10px">Previous weeks 📈</p>
+ ${recent.map(m=>{const r=weekReport(m);return `<div class="row between text-sm" style="padding:7px 0;border-bottom:1px solid var(--border)"><span>${shortDate(m)}</span><strong>${r.total?r.pct+'%':'—'}</strong></div>`}).join('')}
+ <p class="muted text-xs">Older weeks without recorded check-offs are shown as unrecorded, not assumed failures.</p></div>
+ ${missed.length?`<div class="card"><p class="serif font-semibold" style="font-size:17px;margin:0 0 8px">Unfinished tasks · choose what matters</p>
+ <p class="muted text-xs">Move forward only what still deserves your time. No guilt and no automatic backlog.</p>
+ ${missed.map(({date,t})=>`<div style="padding:9px 0;border-bottom:1px solid var(--border)"><div class="text-sm">${escapeHtml(t.label)} <span class="muted text-xs">· ${shortDate(date)}</span></div><div class="row gap2" style="margin-top:8px"><button class="chip" style="background:var(--surface2)" onclick="markRecovered('${date}','${t.id}','carry')">Keep in mind</button><button class="chip" style="background:var(--surface2)" onclick="markRecovered('${date}','${t.id}','skip')">Let go</button></div></div>`).join('')}</div>`:''}`;
+}
+function videoWeekKey(){return getMonday(todayISO());}
+function videoData(){const key=videoWeekKey();return data.videoWeeks[key] ||= {title:'',url:'',lesson:'',practice:'',reflection:'',watched:false,revisited:false,applied:false};}
+function saveVideo(k,v){videoData()[k]=v;saveData();}
+function toggleVideo(k,v){saveVideo(k,v);render();}
+function renderVideoWeek(){
+ const v=videoData(), url=String(v.url||'').trim();
+ const safe=/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+ return `<div class="card">
+ <p class="serif font-semibold" style="font-size:18px;margin:0 0 6px">🎬 Video of the Week</p>
+ <p class="muted text-xs">Optional · one video, one lesson, one real-life application. Not included in your completion score.</p>
+ <input class="input" placeholder="Video title" aria-label="Video title" value="${escapeHtml(v.title)}" oninput="saveVideo('title',this.value)" style="margin-top:10px"/>
+ <input class="input" placeholder="YouTube link" aria-label="YouTube link" value="${escapeHtml(v.url)}" oninput="saveVideo('url',this.value)" style="margin-top:8px"/>
+ ${safe?`<p class="text-sm"><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">▶ Watch this video ↗</a></p>`:''}
+ <p class="muted text-xs">Key lesson</p><textarea rows="2" placeholder="What do I want to remember?" oninput="saveVideo('lesson',this.value)">${escapeHtml(v.lesson)}</textarea>
+ <p class="muted text-xs">This week's practice</p><textarea rows="2" placeholder="One behavior to try..." oninput="saveVideo('practice',this.value)">${escapeHtml(v.practice)}</textarea>
+ <div class="learning-checks">${[['watched','Watched'],['revisited','Revisited'],['applied','Practiced']].map(([k,label])=>`<label><input type="checkbox" ${v[k]?'checked':''} onchange="toggleVideo('${k}',this.checked)"> ${label}</label>`).join('')}</div>
+ <p class="muted text-xs">What changed?</p><textarea rows="2" placeholder="Reflect at the end of the week..." oninput="saveVideo('reflection',this.value)">${escapeHtml(v.reflection)}</textarea>
+ </div>`;
+}
+function financeHistory(kind){
+ const items=(ensureFinance()[kind]||[]), months={};
+ items.forEach(x=>{
+  const key=String(x.date||'').slice(0,7)||'Unknown';
+  months[key]||={count:0,totals:{}};
+  months[key].count++;
+  months[key].totals[x.type]=(months[key].totals[x.type]||0)+Number(x.amount||0);
+ });
+ return `<details style="margin-top:12px"><summary class="text-sm font-semibold" style="cursor:pointer">Monthly history & trends (${Object.keys(months).length} months)</summary>
+ ${Object.keys(months).sort().reverse().map(month=>`<div class="card" style="margin-top:9px"><p class="serif font-semibold text-sm" style="margin:0 0 7px">${escapeHtml(month)} · ${months[month].count} entries</p>
+ ${Object.entries(months[month].totals).map(([type,n])=>`<div class="row between text-xs" style="padding:4px 0"><span>${escapeHtml(type)}</span><strong>₦${Math.round(n).toLocaleString()}</strong></div>`).join('')}</div>`).join('')||'<p class="muted text-xs">No transactions recorded yet.</p>'}
+ </details>`;
 }
 
 /* ===================== RENDER: GROWTH ===================== */
@@ -524,14 +723,14 @@ function renderGrowth(){
     const avg=Math.round(pcts.reduce((s,x)=>s+x,0)/7);
     weeks.push({week:shortDate(m),pct:avg});
   }
-  const {current:streak,longest,days:checkinDays}=checkinStreak();
+  const checkins=checkinStats(); let streak=checkins.current;
+
   const maxBar=160;
   return `
     <div class="grid-2">
-      <div class="stat-card"><span class="emoji">🔥</span><span class="val serif">${streak} ${streak===1?'day':'days'}</span><span class="muted text-xs">Daily opening streak · best: ${longest} days</span></div>
+      <div class="stat-card"><span class="emoji">🔥</span><span class="val serif">${streak} ${streak===1?'day':'days'}</span><span class="muted text-xs">Daily check-in streak · longest ${checkins.longest} days · next ${[7,14,30,60,90].find(n=>n>streak)||'90+'}-day milestone</span></div>
       <div class="stat-card"><span class="emoji">📊</span><span class="val serif">${weeks[weeks.length-1].pct}%</span><span class="muted text-xs">This week · lit so far</span></div>
     </div>
-    <div class="card"><p class="muted text-xs">${checkinDays} recorded check-in days · milestones: 7, 14, 30, 60, 90. Earlier visits cannot be reconstructed without records.</p></div>
     <div class="card">
       <p class="serif font-semibold text-sm" style="margin:0 0 12px;">8-Week Trend</p>
       <div class="bar-chart">
@@ -597,9 +796,7 @@ function financeSummary(kind,items){
  }
  return `<div class="grid-2" style="margin-bottom:12px">${lines.map(([k,v])=>`<div class="stat-card"><span class="muted text-xs">${k}</span><strong>${v}</strong></div>`).join('')}</div><p class="muted text-xs">Transfers are shown separately, not double-counted as expenses. Investment value entries are snapshots, not automatically updated market prices.</p>`;
 }
-function financeCard(kind,label,options){const items=ensureFinance()[kind], totals={};items.forEach(x=>totals[x.type]=(totals[x.type]||0)+x.amount);return `<div class="card"><p class="serif font-semibold" style="font-size:18px;margin:0 0 8px">${label}</p>${financeSummary(kind,items)}<div class="grid-2">${options.map(o=>`<div class="stat-card"><span class="muted text-xs">${o}</span><strong>₦${(totals[o]||0).toLocaleString()}</strong></div>`).join('')}</div><div class="col gap2" style="margin-top:12px"><select id="f-type-${kind}">${options.map(o=>`<option>${o}</option>`).join('')}</select><input class="input" id="f-amount-${kind}" type="number" min="1" placeholder="Amount (₦)"/><input class="input" id="f-note-${kind}" placeholder="Note (optional)"/><button class="add-btn" style="width:100%;padding:10px" onclick="addFinance('${kind}')">+ Record transaction</button></div><div class="col gap2" style="margin-top:12px">${items.slice().reverse().map(x=>`<div class="row between text-xs"><span>${x.date} · ${escapeHtml(x.type)} · ₦${x.amount.toLocaleString()} ${escapeHtml(x.note)}</span><button onclick="removeFinance('${kind}',${x.id})">✕</button></div>`).join('')}</div></div>`;}
-function renderFinanceHistory(){const kinds=[['personal','Personal'],['estate','Real estate'],['light','Light Gallery']];return `<div class="card"><p class="serif font-semibold">💰 Finance history by month</p><p class="muted text-xs">Historical transaction totals by month and business. Transfers and asset-value snapshots are listed separately; these are not automatically profit.</p>${kinds.map(([k,label])=>{const groups={};for(const x of ensureFinance()[k]||[]){const m=(x.date||'').slice(0,7);if(!m)continue;groups[m]||={count:0,types:{}};groups[m].count++;groups[m].types[x.type]=(groups[m].types[x.type]||0)+Number(x.amount||0);}return `<p class="serif font-semibold">${label}</p>${Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([m,v])=>`<div style="margin-bottom:10px"><strong class="text-sm">${m} · ${v.count} entries</strong><p class="muted text-xs">${Object.entries(v.types).map(([type,amt])=>escapeHtml(type)+': ₦'+amt.toLocaleString()).join(' · ')}</p></div>`).join('')||'<p class="muted text-xs">No transactions recorded yet.</p>'}`}).join('')}</div>`;}
-
+function financeCard(kind,label,options){const items=ensureFinance()[kind], totals={};items.forEach(x=>totals[x.type]=(totals[x.type]||0)+x.amount);return `<div class="card"><p class="serif font-semibold" style="font-size:18px;margin:0 0 8px">${label}</p>${financeSummary(kind,items)}<div class="grid-2">${options.map(o=>`<div class="stat-card"><span class="muted text-xs">${o}</span><strong>₦${(totals[o]||0).toLocaleString()}</strong></div>`).join('')}</div><div class="col gap2" style="margin-top:12px"><select id="f-type-${kind}">${options.map(o=>`<option>${o}</option>`).join('')}</select><input class="input" id="f-amount-${kind}" type="number" min="1" placeholder="Amount (₦)"/><input class="input" id="f-note-${kind}" placeholder="Note (optional)"/><button class="add-btn" style="width:100%;padding:10px" onclick="addFinance('${kind}')">+ Record transaction</button></div><div class="col gap2" style="margin-top:12px">${items.slice().reverse().map(x=>`<div class="row between text-xs"><span>${x.date} · ${escapeHtml(x.type)} · ₦${x.amount.toLocaleString()} ${escapeHtml(x.note)}</span><button onclick="removeFinance('${kind}',${x.id})">✕</button></div>`).join('')}</div>${financeHistory(kind)}</div>`;}
 function addJoy(){const el=document.getElementById('joy-note');const v=el?.value.trim();const file=document.getElementById('joy-photo')?.files[0];if(!v&&!file)return;const store=(photo='')=>{if(!data.joy)data.joy=[];data.joy.push({id:Date.now(),date:todayISO(),text:v,photo});saveData();render();};if(file){if(file.size>1200000){alert('Choose a smaller photo (under 1.2 MB) so browser storage does not fill.');return;}const reader=new FileReader();reader.onload=()=>store(reader.result);reader.readAsDataURL(file);}else store();}
 function deleteJoy(id){data.joy=(data.joy||[]).filter(x=>x.id!==id);saveData();render();}
 function renderVision(){const g=data.goals;const carPct=g.carTarget>0?Math.min(100,Math.round(g.carCurrent/g.carTarget*100)):0;return `
@@ -609,175 +806,7 @@ function renderVision(){const g=data.goals;const carPct=g.carTarget>0?Math.min(1
  ${financeCard('personal','💗 Personal finances',['Salary','Commission','Other income','Expense','Subscription','Splurge savings transfer','Investment savings transfer','Investment purchase','Investment current value'])}
  ${financeCard('estate','🏡 Real estate finances',['Deal revenue','Commission income','Partner share payout','Ads','Tools','Subscriptions','Other expense'])}
  ${financeCard('light','💡 Light Gallery finances',['Sale revenue','Product cost','Reinvestment transfer','Owner salary','Ads','Packaging','Shipping','Other expense'])}
- ${renderFinanceHistory()} ${renderBackupCard()}`;}
-
-const IDENTITY_DAYS = [
-  {
-    "name": "Spiritual Identity",
-    "title": "My Spiritual Identity",
-    "text": "I am a woman of God, a priest in my family, a carrier of the Holy Ghost, and a vessel through whom Christ is made known. My life points people toward Him. I am light, a revealer of identity, and a catalyst for meaningful intimacy with God and others. My assignment is to see His will fulfilled.\n\nI seek first God's Kingdom, His will and His way. My life is a reflection of my altar. My private devotion gives substance to my public life. I have the mind of Christ, I grow in His character, and I desire His results. I am kept under the shadow of the Most High. I speak with wisdom, faith and conviction. I walk in grace, favor, courage and peace."
-  },
-  {
-    "name": "Inner World",
-    "title": "My Inner World",
-    "text": "I know myself deeply. I recognize my emotions without surrendering authority to them. I do not rush to defend myself, prove my wealth, or seek approval. I trust my judgment, honor my convictions and communicate with clarity. I can say no without guilt. My heart is warm, but access to it is earned through trust. I guard my faith, mind and body. I function from rest, not desperation."
-  },
-  {
-    "name": "Femininity & Presence",
-    "title": "My Femininity & Presence",
-    "text": "I am a powerhouse who maintains her femininity. My authority does not erase my warmth. I am bubbly, joyful, kind, lighthearted and graceful. I laugh freely and do not make negativity my home. I care beautifully for my hygiene, health, body, mind and appearance. I am a fashion icon in my own expression. I enjoy travel, shopping, beauty and the fruit of my work. My body is worthy of respect, never sexual entitlement."
-  },
-  {
-    "name": "Mind & Character",
-    "title": "My Mind & Character",
-    "text": "I am well-read, intellectually curious, articulate and thoughtful. I acquire knowledge and apply it. I ask meaningful questions, listen carefully and speak with confidence. My word matters. My integrity matters. I have the courage to do what is necessary, even when uncomfortable. I do not merely admire potential; I develop it through discipline and action."
-  },
-  {
-    "name": "Purpose, Work & Abundance",
-    "title": "My Purpose, Work & Abundance",
-    "text": "I am a builder, a creator and a businesswoman. I create and multiply wealth by serving real needs and selling genuine value. In real estate, I serve intentional, financially capable clients with excellence and integrity. People buy through me, invest through me and recommend me because I cultivate trust, competence and meaningful relationships. The works of my hands are visible to those who need them. I believe in divine favor and speed, and I also prepare, follow up, negotiate and execute.\n\nI am financially comfortable and wise in stewardship. Money is a tool, not my identity. Like Joseph, I desire to elevate my family to a new level of financial abundance. I give generously, invest intelligently and enjoy beautiful experiences without needing to prove my worth. My success creates opportunities, lifts others and glorifies God."
-  },
-  {
-    "name": "Love & Relationships",
-    "title": "My Love & Relationships",
-    "text": "I am thoughtful, affectionate, wise and intentional in love. I desire a marriage with a man who honors God, respects my boundaries, cherishes me and delights in my happiness. I desire to be loved generously and consistently, and I bring emotional maturity, warmth, loyalty and care to that relationship. I do not confuse attention with commitment or promises with action. I love without abandoning myself."
-  },
-  {
-    "name": "The Life I Live",
-    "title": "The Life I Live",
-    "text": "My faith is visible in my obedience. My wisdom is visible in my decisions. My confidence is visible in my boundaries. My femininity is visible in my presence. My ambition is visible in my actions. My love is visible in how I treat people. I am not defined by one difficult day. I return to my convictions and keep becoming.\n\nI am a powerhouse, and I am at peace. I am a woman of substance, and I am full of light. I know whose I am. I know what I stand for. I know what I am building."
-  }
-];
-const COMPASS_DEFAULT={
- identity:`MY IDENTITY — THE WOMAN I AM. THE WOMAN I AM BECOMING.
-
-I am a woman of God, a priest in my family, a carrier of the Holy Ghost, and a vessel through whom Christ is made known. My life points people toward Him. I am light, a revealer of identity, and a catalyst for meaningful intimacy with God and others. My assignment is to see His will fulfilled.
-
-I seek first God's Kingdom, His will and His way. My life is a reflection of my altar. My private devotion gives substance to my public life. I have the mind of Christ, I grow in His character, and I desire His results. I am kept under the shadow of the Most High. I speak with wisdom, faith and conviction. I walk in grace, favor, courage and peace.
-
-I know myself deeply. I recognize my emotions without surrendering authority to them. I do not rush to defend myself, prove my wealth, or seek approval. I trust my judgment, honor my convictions and communicate with clarity. I can say no without guilt. My heart is warm, but access to it is earned through trust. I guard my faith, mind and body. I function from rest, not desperation.
-
-I am a powerhouse who maintains her femininity. My authority does not erase my warmth. I am bubbly, joyful, kind, lighthearted and graceful. I laugh freely and do not make negativity my home. I care beautifully for my hygiene, health, body, mind and appearance. I am a fashion icon in my own expression. I enjoy travel, shopping, beauty and the fruit of my work. My body is worthy of respect, never sexual entitlement.
-
-I am well-read, intellectually curious, articulate and thoughtful. I acquire knowledge and apply it. I ask meaningful questions, listen carefully and speak with confidence. My word matters. My integrity matters. I have the courage to do what is necessary, even when uncomfortable. I do not merely admire potential; I develop it through discipline and action.
-
-I am a builder, a creator and a businesswoman. I create and multiply wealth by serving real needs and selling genuine value. In real estate, I serve intentional, financially capable clients with excellence and integrity. People buy through me, invest through me and recommend me because I cultivate trust, competence and meaningful relationships. The works of my hands are visible to those who need them. I believe in divine favor and speed, and I also prepare, follow up, negotiate and execute.
-
-I am financially comfortable and wise in stewardship. Money is a tool, not my identity. Like Joseph, I desire to elevate my family to a new level of financial abundance. I give generously, invest intelligently and enjoy beautiful experiences without needing to prove my worth. My success creates opportunities, lifts others and glorifies God.
-
-I am thoughtful, affectionate, wise and intentional in love. I desire a marriage with a man who honors God, respects my boundaries, cherishes me and delights in my happiness. I desire to be loved generously and consistently, and I bring emotional maturity, warmth, loyalty and care to that relationship. I do not confuse attention with commitment or promises with action. I love without abandoning myself.
-
-My faith is visible in my obedience. My wisdom is visible in my decisions. My confidence is visible in my boundaries. My femininity is visible in my presence. My ambition is visible in my actions. My love is visible in how I treat people. I am not defined by one difficult day. I return to my convictions and keep becoming.
-
-I am a powerhouse, and I am at peace. I am a woman of substance, and I am full of light. I know whose I am. I know what I stand for. I know what I am building.`,
- why:`1. Like Joseph, elevate my family to a new financial level and spoil those I love.
-2. Enjoy wealth and beautiful experiences while knowing my worth does not depend on money.
-3. Be an expression and reflection of God's light so He is glorified.`,
- priorities:`1. God — my faith
-2. My purpose
-3. Me
-4. My family and friends
-5. The people I need to help`,
- values:`1. God is involved in all I do and all that happens to me.
-2. The Bible is the truth.
-3. Constant growth through acquiring and applying knowledge.
-4. Good, active communication.
-5. I trust myself, listen to myself and take care of myself.
-6. Positive perspective and self-talk.
-7. Courageously doing and saying what is necessary.
-8. Spiritual power and authority.
-9. Kindness and love toward everyone.
-10. Integrity in business.
-11. A good name.
-12. Confidence in myself and my abilities.
-13. Giving and helping.`,
- boundaries:`1. No sexual advances or sexual jokes from non-romantic partners.
-2. Non-romantic partners respect my personal space, keeping at least two feet away from my body.
-3. No holding hands with non-romantic partners.
-4. Walk away when disrespected.
-5. Every meeting has a clearly stated objective; protect my time.
-6. No romantic relationships with business partners.
-7. I do not share personal items with anyone outside family.
-8. No oversharing of growth progress.
-9. Lend money no more than once monthly.`
-};
-for(const [k,v] of Object.entries(COMPASS_DEFAULT)){if(data.compass[k]===undefined)data.compass[k]=v;}saveData();
-function saveCompass(k,v){data.compass[k]=v;saveData();}
-function identityText(i){return data.compass.identityDays?.[i]??IDENTITY_DAYS[i].text;}
-function saveIdentityDay(i,value){
-  data.compass.identityDays ||= {};
-  data.compass.identityDays[i]=value;
-  saveData();
-}
-function setIdentityDay(i){data.compass.selectedIdentityDay=i;saveData();render();}
-function identityDayPanel(){
-  const today=new Date().getDay();
-  const chosen=Number.isInteger(data.compass.selectedIdentityDay)?data.compass.selectedIdentityDay:today;
-  const i=(chosen>=0&&chosen<7)?chosen:today;
-  return `<div class="card">
-    <p class="serif" style="font-size:20px;margin:0 0 6px">✨ My Identity</p>
-    <p class="muted text-sm">Seven declarations, one for each day. Select a day to read or edit its statement.</p>
-    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0">
-    ${IDENTITY_DAYS.map((d,n)=>`<button type="button" class="icon-btn" style="width:auto;height:auto;min-height:44px;padding:8px;border-radius:10px;${i===n?'border:1px solid var(--gold, #bba46b);':''}" onclick="setIdentityDay(${n})">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][n]} · ${escapeHtml(d.name)}</button>`).join('')}
-    </div>
-    <p class="serif font-semibold" style="font-size:18px">${escapeHtml(IDENTITY_DAYS[i].title)}</p>
-    <p class="muted text-xs">Read this morning and tonight. You can edit this day's declaration below.</p>
-    <textarea class="compass-text" rows="18" oninput="saveIdentityDay(${i},this.value)">${escapeHtml(identityText(i))}</textarea>
-    </div>`;
-}
-function dailyIdentityReminder(){
-  const i=parseISO(selectedDate).getDay();
-  return `<div class="card card-gold" style="margin:10px 0">
-    <p class="serif font-semibold" style="font-size:17px;margin:0 0 6px">🌅 Morning & 🌙 Night · Today's identity</p>
-    <p class="text-sm" style="margin:0 0 7px"><strong>${escapeHtml(IDENTITY_DAYS[i].title)}</strong> — ${escapeHtml(DAY[i])}</p>
-    <details><summary class="text-sm" style="cursor:pointer">Read today's declaration</summary>
-      <div style="white-space:pre-wrap;line-height:1.75;margin-top:12px">${escapeHtml(identityText(i))}</div>
-    </details>
-    <p class="muted text-xs">Only today's declaration. Read it once in the morning and again at night.</p>
-  </div>`;
-}
-function renderCompass(){
- const labels=[['why','🔥 My Why'],['priorities','🧭 My Priorities'],['values','💎 My Values'],['boundaries','🛡️ My Boundaries']];
- return `<div class="card card-gold"><p class="serif" style="font-size:23px;margin:0 0 8px">My Compass 🧭</p><p class="muted text-sm">A place to return to who you are, what matters, and how you choose to live.</p><p class="serif" style="line-height:1.6">${escapeHtml(data.compass.reminder||'I know whose I am. I know what I stand for. I know what I am building.')}</p><input class="input" placeholder="Remember Today — pin a short declaration" value="${escapeHtml(data.compass.reminder||'')}" oninput="saveCompass('reminder',this.value)"></div>
- ${identityDayPanel()}
- ${labels.map(([k,label])=>`<details class="card"><summary class="serif font-semibold" style="cursor:pointer">${label}</summary><p class="muted text-xs">Editable · saved on this device</p><textarea class="compass-text" rows="9" oninput="saveCompass('${k}',this.value)">${escapeHtml(data.compass[k]??COMPASS_DEFAULT[k])}</textarea></details>`).join('')}`;
-}
-
-
-/* VIDEO OF THE WEEK — optional learning, independent of completion scores */
-function videoWeekKey(){return getMonday(todayISO());}
-function videoRecord(){
-  data.videoWeeks ||= {};
-  return data.videoWeeks[videoWeekKey()] ||= {url:'',title:'',lesson:'',practice:'',watched:false,revisited:false,applied:false,reflection:''};
-}
-function saveVideoField(field,value){
-  videoRecord()[field]=value;
-  saveData();
-}
-function toggleVideoStep(field,checked){
-  saveVideoField(field,checked);
-  render();
-}
-function renderVideoOfWeek(){
-  const v=videoRecord(), week=videoWeekKey();
-  const url=String(v.url||'').trim();
-  const valid=/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
-  return `<div class="card" style="margin-top:14px">
-    <p class="serif font-semibold" style="font-size:20px;margin-bottom:4px">🎬 Video of the Week</p>
-    <p class="muted text-xs">One video, one lesson, one real-life application. Optional — never affects your completion score.</p>
-    <p class="muted text-xs">Week of ${escapeHtml(shortDate(week))}</p>
-    <label class="text-xs muted">Video title<input class="input" placeholder="What are you learning?" value="${escapeHtml(v.title)}" oninput="saveVideoField('title',this.value)"></label>
-    <label class="text-xs muted">YouTube link<input class="input" type="url" placeholder="https://youtube.com/watch?v=..." value="${escapeHtml(v.url)}" oninput="saveVideoField('url',this.value)"></label>
-    ${valid?`<p><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">▶ Open this week's video ↗</a></p>`:''}
-    <label class="text-xs muted">One key lesson<textarea rows="2" placeholder="What idea matters most?" oninput="saveVideoField('lesson',this.value)">${escapeHtml(v.lesson)}</textarea></label>
-    <label class="text-xs muted">One practical action<textarea rows="2" placeholder="How will I use it this week?" oninput="saveVideoField('practice',this.value)">${escapeHtml(v.practice)}</textarea></label>
-    <div style="display:flex;flex-direction:column;gap:10px;margin:10px 0">
-      ${[['watched','Watched attentively'],['revisited','Revisited the useful parts'],['applied','Practiced in real life']].map(([key,label])=>`<label class="text-sm"><input type="checkbox" ${v[key]?'checked':''} onchange="toggleVideoStep('${key}',this.checked)"> ${label}</label>`).join('')}
-    </div>
-    <label class="text-xs muted">Weekly reflection<textarea rows="2" placeholder="What changed because I practiced?" oninput="saveVideoField('reflection',this.value)">${escapeHtml(v.reflection)}</textarea></label>
-    <p class="muted text-xs">Saved by week. Previous weeks remain in your exported OS backup.</p>
-  </div>`;
-}
+ ${renderBackupCard()}`;}
 
 /* ===================== NAV + MAIN RENDER ===================== */
 function renderNav(){
@@ -788,13 +817,14 @@ function renderNav(){
     </button>`).join('')}</div>`;
 }
 function render(){
+  ensureExtras();
   const app=document.getElementById('app');
   let content='';
-  if(activeTab==='today') content=dailyIdentityReminder()+renderToday();
+  if(activeTab==='today') content=renderToday();
   else if(activeTab==='week') content=renderWeek();
-  else if(activeTab==='growth') content=renderGrowth()+renderVideoOfWeek();
-  else if(activeTab==='compass') content=renderCompass();
-  else content=renderVision();
+  else if(activeTab==='growth') content=renderGrowth()+renderVideoWeek();
+  else if(activeTab==='vision') content=renderVision();
+  else content=renderCompass();
   app.innerHTML = `
     <div class="header">
       <p class="brand serif">✿ Becoming OS</p>
