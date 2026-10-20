@@ -203,7 +203,7 @@ function dailyCore(day,date){
  
  if([1,2,3,5].includes(day))x.push(task('ai-practice','AI tools practice','20 minutes · weekdays except content Thursday','growth','growth'));
  x.push(task('work-location',office?'Office day':(sun?'Sunday rest':'Work from home'),'Mon/Wed/Fri office · Tue/Thu WFH unless meetings','growth','growth',{optional:true}));
- if(office)x.push(task('gospel-video','Record gospel & identity TikTok','At the office · Mon/Wed/Fri','identity','growth'));
+ if(!sun)x.push(task('gospel-video','Record gospel & identity TikTok','Working days · Monday–Saturday; record when practical','identity','growth'));
  if(day===2)x.push(task('cold','Real estate cold outreach','90 minutes · 3:00–4:30pm, after relationship calls','growth','growth'));
  if(thu)x.push(task('re-content','REAL ESTATE CONTENT DAY','Batch film, write, edit & schedule · most of day','growth','growth',{featured:true}));
  
@@ -253,7 +253,7 @@ function dailyCore(day,date){
 }
 function getTasksForDay(dayIndex,dateStr){
  const base=dailyCore(dayIndex,dateStr);
- const removed=new Set(['study','crm','calls','sales-roleplay','ai-practice','work-location','gospel-video','cold','re-content','lighting-content','crm-week','foundation-sermons','foundation-prayer','foundation-monthly','foundation-next','affirm-6','affirm-11','affirm-15','affirm-19','affirm-2350','audio-journal','oral-pm','wind-down-week']);
+ const removed=new Set(['work-location','re-content','lighting-content','foundation-sermons','foundation-prayer','foundation-monthly','foundation-next','audio-journal','oral-pm','wind-down-week']);
  const x=base.filter(t=>!removed.has(t.id));
  x.push(task('gratitude','Gratitude Journal','Evening · notice what went well','rest','evening'));
  x.push(task('night-wind-down','Nighttime Wind-Down (Shower & Hygiene)','Evening · shower, hygiene and settle','rest','evening'));
@@ -786,7 +786,7 @@ MY VALUES & CORE BELIEFS
 function compassText(s){return data.compassEdits[s.id]===undefined?s.text:data.compassEdits[s.id];}
 function setCompassSection(id){compassSection=id;render();}
 function editCompass(){const s=COMPASS.find(x=>x.id===compassSection);const v=prompt('Edit this section. Your changes will be saved locally:',compassText(s));if(v!==null){data.compassEdits[s.id]=v;saveData();render();}}
-function renderCompass(){const current=COMPASS.find(x=>x.id===compassSection)||COMPASS[0],today=COMPASS.find(x=>x.day===new Date().getDay());return `<div class="card card-gold"><h2 class="serif" style="margin:0 0 6px">🧭 My Compass</h2><p class="muted text-sm">Return to who you are, what you value and why you are building this life.</p><p class="text-sm"><strong>Today's focus · ${today.title}</strong></p><p class="muted text-xs">Declarations live only here, not in your daily calendar.</p><div class="card" style="background:var(--surface2)"><strong>🌅 Morning declaration</strong><p class="text-sm" style="line-height:1.8">${escapeHtml(today.morning)}</p><strong>🌙 Night declaration</strong><p class="text-sm" style="line-height:1.8">${escapeHtml(today.night)}</p></div></div><div class="card"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${COMPASS.map(s=>`<button class="chip" style="border:1px solid var(--border);background:${s.id===compassSection?'var(--rose)':'var(--surface2)'};color:${s.id===compassSection?'white':'var(--text)'}" onclick="setCompassSection('${s.id}')">${escapeHtml(s.title)}</button>`).join('')}</div><h2 class="serif">${escapeHtml(current.title)}</h2>${current.head?`<p style="color:var(--rose);font-style:italic">${escapeHtml(current.head)}</p>`:''}<div style="white-space:pre-line;line-height:1.9;font-size:14px">${escapeHtml(compassText(current))}</div><button class="input" style="margin-top:18px" onclick="editCompass()">✎ Edit this section</button></div>`;}
+function renderCompass(){const current=COMPASS.find(x=>x.id===compassSection)||COMPASS[0];return `<div class="card card-gold"><h2 class="serif" style="margin:0 0 6px">🧭 My Compass</h2><p class="muted text-sm">Return to who you are, what you value and why you are building this life.</p></div><div class="card"><div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px">${COMPASS.map(s=>`<button class="chip" style="border:1px solid var(--border);background:${s.id===compassSection?'var(--rose)':'var(--surface2)'};color:${s.id===compassSection?'white':'var(--text)'}" onclick="setCompassSection('${s.id}')">${escapeHtml(s.title)}</button>`).join('')}</div><h2 class="serif">${escapeHtml(current.title)}</h2>${current.head?`<p style="color:var(--rose);font-style:italic">${escapeHtml(current.head)}</p>`:''}<div style="white-space:pre-line;line-height:1.9;font-size:14px">${escapeHtml(compassText(current))}</div><button class="input" style="margin-top:18px" onclick="editCompass()">✎ Edit this section</button></div>`;}
 /* ===================== NAV + MAIN RENDER ===================== */
 function renderNav(){
   const tabs=[['today','Today','☀️'],['week','Week','📅'],['growth','Growth','📊'],['vision','Vision','✨'],['compass','Compass','🧭']];
