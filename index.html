@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#FFF4F8" />
+<title>Becoming OS · My Life Dashboard</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --bg:#FFF4F8; --surface:#FFFFFF; --surface2:#FFEAF3; --border:#F6C8DB;
+  --gold:#D99D45; --lavender:#C26B9E; --sage:#579C8A; --rose:#F03791; --dust:#8B77B7;
+  --text:#43243A; --muted:#896E80;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html,body { margin:0; padding:0; }
+body {
+  background: var(--bg); color: var(--text);
+  font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased;
+}
+button { font-family:inherit; font-size:inherit; color:inherit; border:none; background:none;
+  cursor:pointer; text-align:inherit; padding:0; margin:0; -webkit-appearance:none; appearance:none; }
+#app { max-width: 480px; margin: 0 auto; min-height: 100vh; padding-bottom: 90px; }
+.serif { font-family: 'Fraunces', serif; }
+.header { padding: 24px 16px 8px; }
+.brand { color: var(--gold); font-size: 11px; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 600; margin:0; }
+.tagline { color: var(--muted); font-size: 12px; margin: 4px 0 0; }
+.main { padding: 0 16px 16px; display:flex; flex-direction:column; gap:16px; }
+.muted { color: var(--muted); }
+.text-xs { font-size: 12px; }
+.text-sm { font-size: 14px; }
+.text-xl { font-size: 20px; }
+.card { background: var(--surface); border:1px solid var(--border); border-radius:16px; padding:16px; }
+.card-gold { border-color: var(--gold); }
+.row { display:flex; align-items:center; }
+.col { display:flex; flex-direction:column; }
+.between { justify-content: space-between; }
+.gap1 { gap:4px; } .gap2 { gap:8px; } .gap3 { gap:12px; }
+.col.gap2 { gap:8px; } .col.gap3 { gap:12px; }
+.font-semibold { font-weight:600; }
+.mb1{margin-bottom:4px;} .mb2{margin-bottom:8px;}
+
+.icon-btn { background:var(--surface); border-radius:999px; width:36px; height:36px; display:flex; align-items:center; justify-content:center; color:var(--text); font-size:16px; }
+
+.orb-wrap { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 0; }
+.orb { position:relative; width:128px; height:128px; }
+.orb-glow { position:absolute; left:50%; top:50%; width:72%; height:72%; transform:translate(-50%,-50%); border-radius:50%; background:var(--gold); filter: blur(22px); transition: opacity .6s ease; }
+.orb svg { transform: rotate(-90deg); }
+.orb-center { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:2px; }
+.orb-center .emoji { font-size: 26px; }
+.orb-center .pct { font-size: 22px; font-weight:600; }
+
+.section { border-radius:16px; overflow:hidden; background:var(--surface); border:1px solid var(--border); }
+.section-head { width:100%; display:flex; align-items:center; justify-content:space-between; padding:14px; }
+.section-body { padding: 0 14px 14px; display:flex; flex-direction:column; gap:8px; }
+.chev { transition: transform .2s ease; color: var(--muted); display:inline-block; }
+.chev.collapsed { transform: rotate(-90deg); }
+
+.task { width:100%; display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; border:1.5px solid transparent; }
+.task.featured { border-color: var(--gold); box-shadow: 0 0 18px rgba(242,169,59,0.2); }
+.checkbox { flex-shrink:0; width:20px; height:20px; border-radius:999px; border:2px solid; display:flex; align-items:center; justify-content:center; font-size:11px; }
+.task-label { flex:1; min-width:0; }
+.task-label .t { font-size:14px; font-weight:500; }
+.task-label .time { font-size:11px; color:var(--muted); margin-top:2px; }
+.done .t { color: var(--muted); text-decoration: line-through; }
+
+.input, textarea, select {
+  width:100%; background:var(--surface2); color:var(--text); border:1px solid var(--border);
+  border-radius:10px; padding:8px 10px; font-size:13px; font-family:inherit; outline:none;
+}
+textarea { resize:none; }
+input[type=number]::-webkit-outer-spin-button, input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
+input[type=number] { -moz-appearance: textfield; }
+input[type=date] { color-scheme: dark; }
+
+.extra-row { display:flex; align-items:center; gap:12px; padding:12px; border-radius:12px; background:var(--surface2); }
+.extra-row span.label { flex:1; font-size:14px; }
+.extra-row.done span.label { color:var(--muted); text-decoration:line-through; }
+.add-row { display:flex; gap:8px; }
+.add-btn { background:var(--gold); border-radius:10px; width:40px; display:flex; align-items:center; justify-content:center; color:var(--bg); font-size:18px; font-weight:700; align-self:stretch; }
+.icon-x { padding:6px; font-size:14px; color:var(--muted); }
+
+.mini-orb { width:30px; height:30px; border-radius:999px; display:flex; align-items:center; justify-content:center; }
+.mini-orb-inner { width:22px; height:22px; border-radius:999px; background:var(--surface); }
+.week-grid { display:grid; grid-template-columns: repeat(7,1fr); gap:4px; }
+.week-day { display:flex; flex-direction:column; align-items:center; gap:4px; padding:8px 0; border-radius:12px; }
+.week-day.active { background: var(--surface2); }
+
+.progress { width:100%; height:8px; border-radius:999px; background:var(--surface2); overflow:hidden; }
+.progress-fill { height:100%; border-radius:999px; transition: width .4s ease; }
+
+.grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+.stat-card { background:var(--surface); border:1px solid var(--border); border-radius:16px; padding:14px; display:flex; flex-direction:column; gap:4px; }
+.stat-card .emoji { font-size:18px; }
+.stat-card .val { font-size:22px; font-weight:600; }
+
+.bar-chart { display:flex; align-items:flex-end; gap:6px; height:160px; }
+.bar-col { flex:1; display:flex; flex-direction:column; align-items:center; justify-content:flex-end; height:100%; gap:4px; }
+.bar { width:100%; border-radius:6px 6px 0 0; background:var(--gold); min-height:2px; }
+.bar-label { font-size:9px; color:var(--muted); }
+
+.priority-card { display:flex; gap:12px; }
+.priority-icon { flex-shrink:0; width:36px; height:36px; border-radius:999px; display:flex; align-items:center; justify-content:center; font-size:16px; }
+
+.chip { font-size:11px; border-radius:999px; padding:4px 10px; }
+
+.nav { position:fixed; bottom:0; left:0; right:0; max-width:480px; margin:0 auto; display:flex; justify-content:space-around; padding:8px 0; background:var(--surface); border-top:1px solid var(--border); }
+.nav-item { display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 16px; color:var(--muted); font-size:11px; }
+.nav-item.active { color:var(--gold); }
+.nav-item .emoji { font-size:18px; }
+
+body{background:linear-gradient(145deg,#FFF1F8,#FFF9F3 60%,#FCE3EF);}
+.card,.section,.stat-card{box-shadow:0 5px 24px rgba(198,58,124,.065)}
+.header{padding-top:28px}.brand{color:#E42C87;font-size:14px;letter-spacing:.12em}.tagline{font-size:12px}
+.section-head{background:linear-gradient(90deg,#fff,#FFF0F7)}
+.task{transition:transform .12s ease,background .2s}.task:active{transform:scale(.985)}
+.task.featured{border-color:#ED3993;box-shadow:0 0 0 2px #FAD4E7}
+.nav{background:#fff9fd;border-top:1px solid #F2C1D8;box-shadow:0 -5px 24px #e92b8912}
+.nav-item.active{color:#EA2E8C}.nav-item{padding:8px 12px}
+.orb-glow{background:#F03791}.orb-center .pct{color:#D91D77}
+.add-btn{background:#EA2E8C;color:white}.progress-fill{background:#EA2E8C}
+input,textarea,select{color-scheme:light}
+@media(min-width:700px){#app{max-width:690px}.main{padding:0 24px 24px}.nav{max-width:690px}}
+.compass-text{line-height:1.8;font-size:14px;min-height:180px;white-space:pre-wrap;resize:vertical}.nav-item{padding:8px 5px;flex:1}.nav-item .emoji{font-size:17px}details.card summary{list-style:none}details.card summary::-webkit-details-marker{display:none}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<script>
+/* ===================== THEME ===================== */
+const COLORS = {
+  bg:'#FFF4F8', surface:'#FFFFFF', surface2:'#FFEAF3', border:'#F6C8DB',
+  gold:'#D99D45', lavender:'#C26B9E', sage:'#579C8A', rose:'#F03791', dust:'#8B77B7',
+  text:'#43243A', muted:'#896E80',
+};
+const CATEGORY_META = {
+  faith:{color:COLORS.lavender, emoji:'✨'},
+  growth:{color:COLORS.sage, emoji:'📈'},
+  light:{color:COLORS.gold, emoji:'💡'},
+  identity:{color:COLORS.rose, emoji:'🎥'},
+  rest:{color:COLORS.dust, emoji:'🌙'},
+};
+const SECTION_META = {
+  morning:{label:'Morning Rituals', emoji:'🌅', color:COLORS.lavender},
+  growth:{label:'Work, Calling & Learning', emoji:'📈', color:COLORS.sage},
+  light:{label:'Wellness & Nourishment', emoji:'💡', color:COLORS.gold},
+  evening:{label:'Evening & Connection', emoji:'🌙', color:COLORS.dust},
+};
+const WEEKLY_TARGETS_META = {
+ bible:{label:'Bible reading days',emoji:'📖',color:COLORS.lavender},
+ study:{label:'Deep-study sessions',emoji:'📚',color:COLORS.sage},
+ calls:{label:'Relationship call days',emoji:'📞',color:COLORS.gold},
+ content:{label:'Real-estate content day',emoji:'🏡',color:COLORS.rose},
+ lightGalleryPosts:{label:'Light Gallery Friday session',emoji:'💡',color:COLORS.dust}
+};
+
+/* ===================== DATE HELPERS ===================== */
+function toISODate(d){ const yr=d.getFullYear(), mo=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0'); return yr+'-'+mo+'-'+day; }
+function todayISO(){ return toISODate(new Date()); }
+function parseISO(s){ const p=s.split('-').map(Number); return new Date(p[0],p[1]-1,p[2]); }
+function addDays(dateStr,n){ const d=parseISO(dateStr); d.setDate(d.getDate()+n); return toISODate(d); }
+function getMonday(dateStr){ const d=parseISO(dateStr); const day=d.getDay(); const diff = day===0?-6:1-day; d.setDate(d.getDate()+diff); return toISODate(d); }
+function dayName(dateStr){ return parseISO(dateStr).toLocaleDateString('en-US',{weekday:'long'}); }
+function shortDate(dateStr){ return parseISO(dateStr).toLocaleDateString('en-US',{month:'short',day:'numeric'}); }
+function mod(n,m){ return ((n%m)+m)%m; }
+const ANCHOR_MONDAY='2026-06-15';
+function getWeekNumber(dateStr){ const monday=getMonday(dateStr); const diff=Math.round((parseISO(monday).getTime()-parseISO(ANCHOR_MONDAY).getTime())/86400000); return Math.floor(diff/7); }
+function getWeekRotation(wn){ return { biweeklyOn: mod(wn,2)===0, outreachWoman: mod(wn,4)===0, outreachMan: mod(wn,4)===2 }; }
+function escapeHtml(str){ return String(str).replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ===================== BECOMING ROUTINE ===================== */
+const task=(id,label,time,category,section,extra={})=>({id,label,time,category,section,...extra});
+const DAY=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+const scheduleStart='2026-10-18';
+function everyN(date,anchor,n){let a=parseISO(anchor), b=parseISO(date);return b>=a&&Math.round((b-a)/86400000)%n===0;}
+function dailyCore(day,date){
+ const x=[], add=(id,label,time,category='growth',section='growth',extra={})=>x.push(task(id,label,time,category,section,extra));
+ const sun=day===0, course=date>='2026-10-20'&&date<='2026-12-18', exam=date>='2026-12-19'&&date<='2027-01-17';
+ add('wake-pray','Wake, hydrate & connect with God','Morning · flexible','faith','morning');
+ add('oral-am','Morning hygiene & self-care','Morning','light','morning');
+ add('bible-1','Bible reading and reflection','Morning','faith','morning');
+ add('identity-morning','Say today’s identity declaration','Morning · '+IDENTITY_DAYS[day].title,'faith','morning');
+ if(sun){
+  add('rest','Protected rest and worship','Sunday · no business quota','rest','growth');
+  add('weekly-reflection','Gentle weekly reflection','Optional 10–15 minutes','rest','evening',{optional:true});
+ } else {
+  if(day===1){add('crm','Real estate · CRM and pipeline','Focus block · 3 hours');}
+  if(day===2){add('crm','Real estate · follow-ups','Focus block · 1 hour');add('light-content','Light Gallery · marketing, content & ads','Focus block · 2½ hours','light');}
+  if(day===3){add('crm','Real estate · sales and relationships','Focus block · 2 hours');add('maintenance','Maintenance partnership · planning','Focus block · 1 hour');}
+  if(day===4){add('re-content','Real estate · record videos & follow up','Focus block · 1½ hours');add('light-content','Light Gallery · content batching & scheduling','Focus block · 2½ hours','light');}
+  if(day===5){add('crm','Real estate · conversions and CRM','Focus block · 2½ hours');add('light-sales','Light Gallery · sales check','30 minutes','light');}
+  if(day===6){add('crm-week','Real estate · weekly pipeline review','45 minutes');add('maintenance','Maintenance partnership · planning','1 hour');add('light-review','Light Gallery · weekly review','45 minutes','light');}
+  if(course){
+   const count=[0,2,1,1,2,1,1][day];
+   for(let i=1;i<=count;i++)add('sermon-'+i,'Compulsory Sermon Project · '+i+' of '+count,'60–90+ minutes · listen attentively','faith');
+   if([1,3,5,6].includes(day))add('prayer-block','Foundation School · prayer block','Up to 2 hours · log actual minutes','faith');
+   if([2,3,5,6].includes(day))add('optional-sermon','Optional curriculum-map sermon','Only if capacity allows','faith','growth',{optional:true});
+  }
+  if(exam)add('exam-prep','Foundation School · exam preparation','Focused review · flexible','faith');
+  add('german','German practice','10 minutes · optional','growth','growth',{optional:true});
+ }
+ add('reading','Read and nourish my mind','Evening · flexible','growth','evening',{optional:true});
+ add('identity-evening','Say today’s identity declaration','Night · '+IDENTITY_DAYS[day].title,'faith','evening');
+ add('night-wind-down','Nighttime Wind-Down (Shower & Hygiene)','Evening · shower, body care and oral hygiene','rest','evening');
+ add('gratitude-journal','Gratitude Journal','Evening · reflect on what went well','rest','evening');
+ add('sleep','Rest and sleep','Protect sufficient sleep','rest','evening');
+ return x;
+}
+function getTasksForDay(dayIndex,dateStr){return dailyCore(dayIndex,dateStr);}
+/* ===================== APP DATA ===================== */
+function getDefaultData(){return {days:{},weekly:{},finance:{personal:[],estate:[],light:[]},joy:[],goals:{carCurrent:0,carTarget:0,moveOutDate:'',dealsClosed:0,dealsTarget:5,weightCurrent:0,weightTarget:60}};}
+function defaultWeekly(){return {bible:{current:0,target:7},study:{current:0,target:6},calls:{current:0,target:5},content:{current:0,target:1},lightGalleryPosts:{current:0,target:1}};}
+function getWeeklyData(d,monday){ const old=d.weekly[monday]||{};return Object.fromEntries(Object.entries(defaultWeekly()).map(([k,v])=>[k,old[k]||v])); }
+function computeDayStats(dateStr,d){
+  const dayIndex=parseISO(dateStr).getDay();
+  const tasks=getTasksForDay(dayIndex,dateStr);
+  const dayData=(d.days&&d.days[dateStr])||{tasks:{},custom:[],journal:''};
+  const custom=dayData.custom||[];
+  const doneTasks=tasks.filter(t=>!t.optional&&dayData.tasks&&dayData.tasks[t.id]).length;
+  const doneCustom=custom.filter(c=>c.done).length;
+  const total=tasks.filter(t=>!t.optional).length+custom.length;
+  const done=doneTasks+doneCustom;
+  const pct = total===0?0:Math.round((done/total)*100);
+  return {tasks,dayData,total,done,pct};
+}
+
+/* ===================== STATE ===================== */
+const STORAGE_KEY='becoming-os-data-v1';
+function loadData(){
+  try { const raw=localStorage.getItem(STORAGE_KEY); if(raw) return JSON.parse(raw); } catch(e){}
+  return getDefaultData();
+}
+function saveData(){ try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); }catch(e){} }
+
+let data = loadData();
+function initializeOS(){
+ data.days ||= {}; data.finance ||= {personal:[],estate:[],light:[]}; data.checkins ||= {};
+ data.checkins[todayISO()]=true;
+ data.inbox ||= []; data.weekNotes ||= {}; data.outcomes ||= {}; data.compass ||= {};
+ data.modes ||= {}; data.taskDecisions ||= {};
+ saveData();
+}
+initializeOS();
+let activeTab='today';
+let selectedDate=todayISO();
+let collapsedSections={};
+let importText='';
+
+/* ===================== MUTATIONS ===================== */
+function ensureDay(dateStr){ if(!data.days[dateStr]) data.days[dateStr]={tasks:{},custom:[],journal:''}; return data.days[dateStr]; }
+function toggleTask(taskId){ const day=ensureDay(selectedDate); day.tasks[taskId]=!day.tasks[taskId]; saveData(); render(); }
+function addCustomTask(){
+  const input=document.getElementById('new-task-input');
+  const text=(input&&input.value||'').trim();
+  if(!text) return;
+  const day=ensureDay(selectedDate);
+  day.custom.push({id:'c-'+Date.now(), text, done:false});
+  saveData(); render();
+}
+function toggleCustom(id){ const day=ensureDay(selectedDate); const c=day.custom.find(c=>c.id===id); if(c) c.done=!c.done; saveData(); render(); }
+function deleteCustom(id){ const day=ensureDay(selectedDate); day.custom=day.custom.filter(c=>c.id!==id); saveData(); render(); }
+function updateJournal(text){ const day=ensureDay(selectedDate); day.journal=text; saveData(); }
+function changeDate(delta){ selectedDate=addDays(selectedDate,delta); render(); }
+function toggleSection(sec){ collapsedSections[sec]=!collapsedSections[sec]; render(); }
+function setTab(tab){ activeTab=tab; render(); }
+function jumpToDay(d){ selectedDate=d; activeTab='today'; render(); }
+
+function onWeeklyInput(monday,key,field,val){
+  if(!data.weekly[monday]) data.weekly[monday]=defaultWeekly();
+  data.weekly[monday][key][field]=Number(val)||0;
+  saveData();
+  const v=data.weekly[monday][key];
+  const pct = v.target>0 ? Math.min(100, Math.round((v.current/v.target)*100)) : 0;
+  const bar=document.getElementById('out-'+key+'-bar'); if(bar) bar.style.width=pct+'%';
+  updateGoalScore(monday);
+}
+function updateGoalScore(monday){
+  const weekly=getWeeklyData(data,monday);
+  const pcts=Object.values(weekly).map(v=>v.target>0?Math.min(100,(v.current/v.target)*100):0);
+  const score=Math.round(pcts.reduce((s,x)=>s+x,0)/pcts.length);
+  const el=document.getElementById('goal-score-val'); if(el) el.textContent=score+'%';
+}
+function onCarInput(field,val){
+  data.goals[field]=Number(val)||0;
+  saveData();
+  const g=data.goals;
+  const pct=g.carTarget>0?Math.min(100,Math.round((g.carCurrent/g.carTarget)*100)):0;
+  const bar=document.getElementById('car-bar'); if(bar) bar.style.width=pct+'%';
+  const pctEl=document.getElementById('car-pct'); if(pctEl) pctEl.textContent=pct+'%';
+}
+function onMoveOutChange(val){
+  data.goals.moveOutDate=val;
+  saveData();
+  const days=Math.ceil((parseISO(val).getTime()-parseISO(todayISO()).getTime())/86400000);
+  const el=document.getElementById('moveout-days'); if(el) el.textContent = days>0?days+' days':'Time to go 🎉';
+}
+function adjustDeals(delta){
+  data.goals.dealsClosed=Math.max(0,data.goals.dealsClosed+delta);
+  saveData(); render();
+}
+function onWeightInput(val){
+  data.goals.weightCurrent=Number(val)||0;
+  saveData();
+  const g=data.goals;
+  const pct=g.weightTarget>0?Math.min(100,Math.round((g.weightCurrent/g.weightTarget)*100)):0;
+  const bar=document.getElementById('weight-bar'); if(bar) bar.style.width=pct+'%';
+}
+
+/* ===================== BACKUP / RESTORE ===================== */
+function copyBackup(){
+  const text=JSON.stringify(data);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>{
+      const btn=document.getElementById('copy-btn'); if(btn) btn.textContent='✓ Copied!';
+      setTimeout(()=>{ const b=document.getElementById('copy-btn'); if(b) b.textContent='📋 Copy data'; },2000);
+    }).catch(()=>{ const ta=document.getElementById('backup-text'); if(ta){ ta.focus(); ta.select(); } });
+  } else {
+    const ta=document.getElementById('backup-text'); if(ta){ ta.focus(); ta.select(); }
+  }
+}
+function downloadBackup(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='becoming-os-backup-'+todayISO()+'.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function restoreFromText(){ applyRestoredData(importText); }
+function restoreFromFile(file){
+  if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>applyRestoredData(e.target.result);
+  reader.readAsText(file);
+}
+function applyRestoredData(jsonString){
+  const status=document.getElementById('backup-status');
+  try{
+    const parsed=JSON.parse(jsonString);
+    if(!parsed||typeof parsed!=='object') throw new Error('bad');
+    const defaults=getDefaultData();
+    data = {
+      days: parsed.days&&typeof parsed.days==='object'?parsed.days:{},
+      weekly: parsed.weekly&&typeof parsed.weekly==='object'?parsed.weekly:{},
+      goals: Object.assign({}, defaults.goals, parsed.goals||{}), finance:parsed.finance||{personal:[],estate:[],light:[]},joy:parsed.joy||[],
+    };
+    importText='';
+    saveData();
+    render();
+    const s=document.getElementById('backup-status');
+    if(s){ s.textContent="Restored — everything's back."; s.style.color=COLORS.sage; }
+  }catch(e){
+    if(status){ status.textContent="That didn't look like valid backup data."; status.style.color=COLORS.rose; }
+  }
+}
+
+/* ===================== RENDER: TODAY ===================== */
+function renderTask(t,dayData){
+  const meta=CATEGORY_META[t.category];
+  const checked=!!(dayData.tasks&&dayData.tasks[t.id]);
+  return `
+    <button class="task ${checked?'done':''} ${t.featured?'featured':''}"
+      style="background:${checked?meta.color+'22':COLORS.surface2};"
+      onclick="toggleTask('${t.id}')">
+      <span class="checkbox" style="border-color:${meta.color};background:${checked?meta.color:'transparent'};color:${COLORS.bg};">${checked?'✓':''}</span>
+      <span class="task-label">
+        <div class="t">${escapeHtml(t.label)}</div>
+        ${t.time?`<div class="time">${escapeHtml(t.time)}</div>`:''}
+      </span>
+      <span>${meta.emoji}</span>
+    </button>`;
+}
+
+function renderToday(){
+  const stats=computeDayStats(selectedDate,data);
+  const {tasks,dayData,total,done,pct}=stats;
+  const isToday = selectedDate===todayISO();
+  const sections=['morning','growth','evening'];
+
+  const orbGlow = (0.12 + (pct/100)*0.5).toFixed(2);
+  const radius=57; const circumference=2*Math.PI*radius;
+  const offset=circumference - (pct/100)*circumference;
+
+  let html = `
+    <div class="row between">
+      <button class="icon-btn" onclick="changeDate(-1)">‹</button>
+      <div style="text-align:center;">
+        <p class="serif text-xl font-semibold" style="margin:0;">${dayName(selectedDate)}</p>
+        <p class="muted text-xs" style="margin:2px 0 0;">${shortDate(selectedDate)}${isToday?' · Today':''}</p>
+      </div>
+      <button class="icon-btn" onclick="changeDate(1)">›</button>
+    </div>
+    <div class="orb-wrap">
+      <div class="orb">
+        <div class="orb-glow" style="opacity:${orbGlow}"></div>
+        <svg width="128" height="128">
+          <circle cx="64" cy="64" r="${radius}" stroke="${COLORS.surface2}" stroke-width="9" fill="none"/>
+          <circle cx="64" cy="64" r="${radius}" stroke="${COLORS.gold}" stroke-width="9" fill="none"
+            stroke-dasharray="${circumference}" stroke-dashoffset="${offset}" stroke-linecap="round"
+            style="transition: stroke-dashoffset .6s ease;"/>
+        </svg>
+        <div class="orb-center">
+          <span class="emoji">🌸</span>
+          <span class="pct serif">${pct}%</span>
+        </div>
+      </div>
+      <p class="muted text-xs" style="margin:0;">${done} of ${total} moments completed</p><p class="text-xs" style="margin:4px 0;color:${COLORS.rose}">Affirmations: ${['affirm-6','affirm-11','affirm-15','affirm-19','affirm-2350'].filter(id=>dayData.tasks?.[id]).length}/5 · daily intention: 3</p>
+    </div>
+  `;
+
+  sections.forEach(sec=>{
+    const secTasks=tasks.filter(t=>t.section===sec);
+    if(secTasks.length===0) return;
+    const meta=SECTION_META[sec];
+    const doneCount=secTasks.filter(t=>dayData.tasks&&dayData.tasks[t.id]).length;
+    const collapsed=!!collapsedSections[sec];
+    html += `
+      <div class="section">
+        <button class="section-head" onclick="toggleSection('${sec}')">
+          <div class="row gap2"><span>${meta.emoji}</span><span class="serif font-semibold text-sm" style="color:${meta.color}">${meta.label}</span></div>
+          <div class="row gap2"><span class="muted text-xs">${doneCount}/${secTasks.length}</span><span class="chev ${collapsed?'collapsed':''}">⌄</span></div>
+        </button>
+        ${collapsed?'':`<div class="section-body">${secTasks.map(t=>renderTask(t,dayData)).join('')}</div>`}
+      </div>`;
+  });
+
+  const customs=dayData.custom||[];
+  html += `
+    <div class="card">
+      <p class="serif font-semibold text-sm" style="margin:0 0 12px;">✨ Today's Extras</p>
+      <div class="col gap2" style="margin-bottom:12px;">
+        ${customs.length===0?`<p class="muted text-xs" style="font-style:italic;margin:0;">Nothing extra yet — add what came up today.</p>`:
+          customs.map(c=>`
+            <div class="extra-row ${c.done?'done':''}">
+              <button class="checkbox" style="border-color:${COLORS.gold};background:${c.done?COLORS.gold:'transparent'};color:${COLORS.bg};" onclick="toggleCustom('${c.id}')">${c.done?'✓':''}</button>
+              <span class="label">${escapeHtml(c.text)}</span>
+              <button class="icon-x" onclick="deleteCustom('${c.id}')">✕</button>
+            </div>`).join('')}
+      </div>
+      <div class="add-row">
+        <input class="input" id="new-task-input" placeholder="What came up today?" onkeydown="if(event.key==='Enter') addCustomTask()" />
+        <button class="add-btn" onclick="addCustomTask()">+</button>
+      </div>
+    </div>`;
+
+  html += `
+    <div class="card">
+      <div class="row gap2" style="margin-bottom:12px;"><span>✎</span><span class="serif font-semibold text-sm">Journal</span></div>
+      <textarea class="input" rows="4" placeholder="How did today go?" oninput="updateJournal(this.value)">${escapeHtml(dayData.journal||'')}</textarea>
+    </div>`;
+
+  return renderDailyTools()+html;
+}
+
+
+function updatePriorities(v){ensureDay(selectedDate).priorities=v;saveData();}
+function captureInbox(){const e=document.getElementById('capture-input');if(!e||!e.value.trim())return;data.inbox.push({id:Date.now(),text:e.value.trim(),date:todayISO(),status:'inbox'});saveData();render();}
+function inboxAction(id,action){const x=data.inbox.find(x=>x.id===id);if(!x)return;if(action==='today'){ensureDay(todayISO()).custom.push({id:'inbox-'+id,text:x.text,done:false});x.status='scheduled';}else x.status=action;saveData();render();}
+function toggleLightDay(){data.modes[selectedDate]=!data.modes[selectedDate];saveData();render();}
+function recoverTask(date,id,action){data.taskDecisions[date]||={};data.taskDecisions[date][id]=action;if(action==='reschedule'){const label=getTasksForDay(parseISO(date).getDay(),date).find(t=>t.id===id)?.label||id;const next=addDays(todayISO(),1);ensureDay(next).custom.push({id:'recovery-'+Date.now()+'-'+id,text:'Carry-over: '+label,done:false});}saveData();render();}
+function saveWeekNote(monday,value){data.weekNotes[monday]=value;saveData();}
+function saveOutcome(monday,kind,value){data.outcomes[monday]||={};data.outcomes[monday][kind]=value;saveData();}
+function weekReport(monday){const end=addDays(monday,6),last=end<todayISO()?end:addDays(todayISO(),-1);let total=0,done=0,by={};for(let d=monday;d<=last;d=addDays(d,1)){const t=getTasksForDay(parseISO(d).getDay(),d).filter(x=>!x.optional);const dd=data.days[d]||{};for(const x of t){const decision=data.taskDecisions[d]?.[x.id];if(decision==='skip'||decision==='cancel')continue;total++;by[x.category]||={total:0,done:0};by[x.category].total++;if(dd.tasks?.[x.id]){done++;by[x.category].done++;}}for(const c of dd.custom||[]){total++;done+=Number(!!c.done);}}return {total,done,pct:total?Math.round(done/total*100):null,by};}
+function checkinStreak(){const dates=Object.keys(data.checkins||{}).filter(k=>data.checkins[k]).sort();const set=new Set(dates);let d=todayISO(),current=0;if(!set.has(d))d=addDays(d,-1);while(set.has(d)){current++;d=addDays(d,-1);}let longest=0,run=0,prev='';for(const x of dates){run=prev&&addDays(prev,1)===x?run+1:1;longest=Math.max(longest,run);prev=x;}return {current,longest,days:dates.length};}
+function renderDailyTools(){const dd=ensureDay(selectedDate),light=!!data.modes[selectedDate];return `<div class="card"><p class="serif font-semibold">🎯 Today's Top 3</p><p class="muted text-xs">Three outcomes, not another long to-do list.</p><textarea rows="3" placeholder="1. …&#10;2. …&#10;3. …" oninput="updatePriorities(this.value)">${escapeHtml(dd.priorities||'')}</textarea><button class="input" style="margin-top:10px" onclick="toggleLightDay()">${light?'✓ Minimum-Viable Day ON · switch off':'🌿 Switch to Minimum-Viable Day'}</button>${light?'<p class="muted text-xs">Focus on one essential business action, one spiritual commitment, and evening care. Your other tasks remain available.</p>':''}</div><div class="card"><p class="serif font-semibold">📥 Quick Capture</p><div class="add-row"><input class="input" id="capture-input" placeholder="Capture a task or idea…" onkeydown="if(event.key==='Enter')captureInbox()"><button class="add-btn" onclick="captureInbox()">+</button></div><p class="muted text-xs">${data.inbox.filter(x=>x.status==='inbox').length} items waiting · manage in Week</p></div>`;}
+function renderReview(){const prev=addDays(getMonday(todayISO()),-7),report=weekReport(prev),hist=[];for(let i=7;i>=0;i--){const m=addDays(getMonday(todayISO()),-7*i),r=weekReport(m);hist.push(`<div class="row between" style="padding:8px 0;border-bottom:1px solid var(--border)"><span>${shortDate(m)}</span><strong>${r.pct===null?'No data':r.pct+'%'}</strong></div>`);}const misses=[];for(let d=prev;d<=addDays(prev,6);d=addDays(d,1)){const dd=data.days[d]||{};for(const t of getTasksForDay(parseISO(d).getDay(),d).filter(x=>!x.optional&&!dd.tasks?.[x.id]&&!data.taskDecisions[d]?.[x.id]))misses.push({d,t});}
+return `<div class="card"><p class="serif font-semibold">📊 Last week's performance</p><p class="text-xl serif">${report.pct===null?'No recorded activity':report.pct+'% completion'}</p><p class="muted text-xs">${report.done}/${report.total} scheduled activities · week of ${shortDate(prev)}. A score measures activity, not personal worth.</p>${Object.entries(report.by).map(([k,v])=>`<p class="text-sm">${escapeHtml(k)} · ${v.done}/${v.total}</p>`).join('')}<p class="serif font-semibold">Results beyond activity</p>${[['leads','Qualified leads / follow-ups converted'],['sales','Sales / deals closed'],['prayer','Prayer hours completed'],['sermons','Compulsory sermons completed']].map(([k,l])=>`<label class="text-xs muted">${l}<input class="input" type="number" min="0" step="any" value="${escapeHtml(data.outcomes[prev]?.[k]??'')}" oninput="saveOutcome('${prev}','${k}',this.value)"></label>`).join('')}<p class="serif font-semibold">Weekly reflection</p><textarea rows="3" placeholder="What worked? What needs to change?" oninput="saveWeekNote('${prev}',this.value)">${escapeHtml(data.weekNotes[prev]||'')}</textarea></div><div class="card"><p class="serif font-semibold">📈 Weekly history</p>${hist.join('')}</div><div class="card"><p class="serif font-semibold">↪ Missed-task recovery</p><p class="muted text-xs">Choose deliberately. Reschedule adds a task to tomorrow.</p>${misses.slice(0,18).map(({d,t})=>`<div style="padding:9px 0;border-bottom:1px solid var(--border)"><p class="text-sm" style="margin:0 0 6px">${shortDate(d)} · ${escapeHtml(t.label)}</p><div class="row gap2">${['reschedule','skip','cancel'].map(a=>`<button class="chip" style="background:var(--surface2)" onclick="recoverTask('${d}','${t.id}','${a}')">${a}</button>`).join('')}</div></div>`).join('')||'<p class="muted text-xs">No unresolved tasks from last week.</p>'}</div><div class="card"><p class="serif font-semibold">📥 Capture inbox</p>${data.inbox.filter(x=>x.status==='inbox').map(x=>`<div style="padding:10px 0"><p class="text-sm">${escapeHtml(x.text)}</p><div class="row gap2"><button class="chip" style="background:var(--surface2)" onclick="inboxAction(${x.id},'today')">Add to today</button><button class="chip" style="background:var(--surface2)" onclick="inboxAction(${x.id},'archived')">Archive</button></div></div>`).join('')||'<p class="muted text-xs">Inbox clear.</p>'}</div>`;}
+
+/* ===================== RENDER: WEEK ===================== */
+function renderOutputRow(monday,key,meta,value){
+  const pct = value.target>0?Math.min(100,Math.round((value.current/value.target)*100)):0;
+  return `
+    <div>
+      <div class="row between" style="margin-bottom:6px;">
+        <div class="row gap2"><span>${meta.emoji}</span><span class="text-sm">${meta.label}</span></div>
+        <div class="row gap1">
+          <input class="input" type="number" style="width:48px;text-align:center;padding:4px;" value="${value.current}"
+            oninput="onWeeklyInput('${monday}','${key}','current',this.value)" />
+          <span class="muted text-xs">/</span>
+          <input class="input" type="number" style="width:48px;text-align:center;padding:4px;" value="${value.target}"
+            oninput="onWeeklyInput('${monday}','${key}','target',this.value)" />
+        </div>
+      </div>
+      <div class="progress"><div class="progress-fill" id="out-${key}-bar" style="width:${pct}%;background:${meta.color};"></div></div>
+    </div>`;
+}
+function renderRotationCard(monday){
+  const rot=getWeekRotation(getWeekNumber(monday));
+  const items=[];
+  if(rot.biweeklyOn) items.push('Hobby time','Solo date',"Mom's shop shoot",'Mentor check-in');
+  if(rot.outreachWoman) items.push('Outreach: admired woman');
+  if(rot.outreachMan) items.push('Outreach: admired man');
+  return `
+    <div class="card">
+      <div class="row gap2" style="margin-bottom:8px;"><span>📅</span><span class="serif font-semibold text-sm">This Week's Rotation</span></div>
+      ${items.length>0?`<div class="row" style="flex-wrap:wrap;gap:8px;">${items.map(i=>`<span class="chip" style="background:${COLORS.dust}22;color:${COLORS.dust}">${i}</span>`).join('')}</div>`
+        : `<p class="muted text-xs" style="font-style:italic;margin:0;">A lighter week — no rotating extras. They'll resurface on schedule, automatically.</p>`}
+      <p class="muted text-xs" style="margin:8px 0 0;">Rotates on its own — these show up on Sat/Sun when it's their week. Nothing to track.</p>
+    </div>`;
+}
+function weeklyAchievement(date){const days=Array.from({length:7},(_,i)=>addDays(getMonday(date),i));const ids=['crm','re-content','light-content','maintenance','sermon-1','prayer-block'];return ids.map(id=>{let target=0,done=0;for(const d of days){if(getTasksForDay(parseISO(d).getDay(),d).some(t=>t.id===id)){target++;done+=Number(!!data.days[d]?.tasks?.[id]);}}return [id.replace(/-/g,' '),done,target];}).filter(x=>x[2]);}
+function renderWeek(){
+ const monday=getMonday(selectedDate), days=Array.from({length:7},(_,i)=>addDays(monday,i));
+ const stats=days.map(d=>computeDayStats(d,data));
+ const avg=Math.round(stats.reduce((n,s)=>n+s.pct,0)/7);
+ return renderReview()+`<div class="card"><p class="serif" style="font-size:22px;margin:0 0 8px">Your week in bloom 🌷</p><p class="muted text-sm" style="margin:0">Week of ${shortDate(monday)} · ${avg}% average completion</p><div class="progress" style="margin-top:14px"><div class="progress-fill" style="width:${avg}%;background:${COLORS.rose}"></div></div></div>
+ <div class="week-grid">${days.map((d,i)=>`<button class="week-day ${d===selectedDate?'active':''}" onclick="jumpToDay('${d}')"><span class="text-xs">${dayName(d).slice(0,3)}</span><span class="mini-orb" style="background:conic-gradient(${COLORS.rose} ${stats[i].pct*3.6}deg,${COLORS.surface2} 0deg)"><span class="mini-orb-inner"></span></span><span class="text-xs">${shortDate(d).split(' ')[1]}</span></button>`).join('')}</div>
+ <div class="card"><p class="serif font-semibold">Weekly goals · automatically tracked</p>${weeklyAchievement(selectedDate).map(([name,done,target])=>`<div style="margin:12px 0"><div class="row between text-sm"><span>${name}</span><strong>${done}/${target}</strong></div><div class="progress"><div class="progress-fill" style="width:${Math.min(100,done/target*100)}%;background:${COLORS.rose}"></div></div></div>`).join('')}</div>
+ <div class="card"><p class="serif font-semibold">Your rhythm this week</p>${days.map((d,i)=>`<div class="row between" style="padding:9px 0;border-bottom:1px solid ${COLORS.border}"><span>${dayName(d)} · ${stats[i].done}/${stats[i].total}</span><span style="color:${COLORS.rose};font-weight:600">${stats[i].pct}%</span></div>`).join('')}</div>`;
+}
+
+/* ===================== RENDER: GROWTH ===================== */
+function renderGrowth(){
+  const today=todayISO();
+  const currentMonday=getMonday(today);
+  const weeks=[];
+  for(let i=7;i>=0;i--){
+    const m=addDays(currentMonday,-7*i);
+    const weekDates=Array.from({length:7},(_,j)=>addDays(m,j));
+    const pcts=weekDates.map(d=>computeDayStats(d,data).pct);
+    const avg=Math.round(pcts.reduce((s,x)=>s+x,0)/7);
+    weeks.push({week:shortDate(m),pct:avg});
+  }
+  const {current:streak,longest,days:checkinDays}=checkinStreak();
+  const maxBar=160;
+  return `
+    <div class="grid-2">
+      <div class="stat-card"><span class="emoji">🔥</span><span class="val serif">${streak} ${streak===1?'day':'days'}</span><span class="muted text-xs">Daily opening streak · best: ${longest} days</span></div>
+      <div class="stat-card"><span class="emoji">📊</span><span class="val serif">${weeks[weeks.length-1].pct}%</span><span class="muted text-xs">This week · lit so far</span></div>
+    </div>
+    <div class="card"><p class="muted text-xs">${checkinDays} recorded check-in days · milestones: 7, 14, 30, 60, 90. Earlier visits cannot be reconstructed without records.</p></div>
+    <div class="card">
+      <p class="serif font-semibold text-sm" style="margin:0 0 12px;">8-Week Trend</p>
+      <div class="bar-chart">
+        ${weeks.map(w=>{
+          const h=Math.max(2,(w.pct/100)*maxBar);
+          const opacity=(0.35+(w.pct/100)*0.65).toFixed(2);
+          return `<div class="bar-col"><div class="bar" style="height:${h}px;opacity:${opacity};"></div><span class="bar-label">${w.week}</span></div>`;
+        }).join('')}
+      </div>
+    </div>
+    <p class="muted text-xs" style="text-align:center;padding:0 16px;">Every bar is a week of seeds — planted, watered, some already harvested. The trend matters more than any single day.</p>`;
+}
+
+/* ===================== RENDER: VISION ===================== */
+function renderPriority(emoji,color,title,desc){
+  return `<div class="card priority-card">
+    <div class="priority-icon" style="background:${color}22;">${emoji}</div>
+    <div>
+      <p class="serif font-semibold text-sm" style="margin:0;">${title}</p>
+      <p class="muted text-xs" style="margin:4px 0 0;">${desc}</p>
+    </div>
+  </div>`;
+}
+function renderBackupCard(){
+  return `
+    <div class="card col gap2">
+      <div class="row gap2"><span>📋</span><span class="serif font-semibold text-sm">Backup & Restore</span></div>
+      <p class="muted text-xs" style="margin:0;">Your data lives in this browser only. Back it up regularly — especially before switching phones or browsers, or clearing browsing data.</p>
+      <div class="row gap2">
+        <button class="input" style="width:auto;flex:1;text-align:center;font-weight:600;" onclick="copyBackup()" id="copy-btn">📋 Copy data</button>
+        <button class="input" style="width:auto;flex:1;text-align:center;font-weight:600;" onclick="downloadBackup()">⬇ Download file</button>
+      </div>
+      <textarea class="input" rows="2" readonly id="backup-text" onfocus="this.select()">${escapeHtml(JSON.stringify(data))}</textarea>
+      <div style="height:1px;background:${COLORS.border};margin:4px 0;"></div>
+      <p class="muted text-xs" style="margin:0;">Restore: paste backup text below, or choose a backup file.</p>
+      <textarea class="input" rows="2" placeholder="Paste backup data here..." oninput="importText=this.value"></textarea>
+      <input type="file" id="restore-file" accept="application/json,.json,.txt" style="display:none" onchange="restoreFromFile(this.files[0])" />
+      <div class="row gap2">
+        <button class="input" style="width:auto;flex:1;text-align:center;font-weight:600;background:${COLORS.gold};color:${COLORS.bg};border-color:${COLORS.gold};" onclick="restoreFromText()">⬆ Restore pasted</button>
+        <button class="input" style="width:auto;flex:1;text-align:center;font-weight:600;" onclick="document.getElementById('restore-file').click()">📁 Choose file</button>
+      </div>
+      <p class="text-xs" id="backup-status" style="margin:0;min-height:14px;"></p>
+    </div>`;
+}
+function ensureFinance(){if(!data.finance)data.finance={personal:[],estate:[],light:[]};return data.finance;}
+function addFinance(kind){const amount=Number(document.getElementById('f-amount-'+kind)?.value);const type=document.getElementById('f-type-'+kind)?.value;const note=document.getElementById('f-note-'+kind)?.value||'';if(!Number.isFinite(amount)||amount<=0)return;ensureFinance()[kind].push({id:Date.now(),date:todayISO(),type,amount,note});saveData();render();}
+function removeFinance(kind,id){ensureFinance()[kind]=ensureFinance()[kind].filter(x=>x.id!==id);saveData();render();}
+function financeSummary(kind,items){
+ const sum=type=>items.filter(x=>x.type===type).reduce((a,x)=>a+Number(x.amount||0),0);
+ const fmt=n=>'₦'+Math.round(n).toLocaleString();
+ let lines=[];
+ if(kind==='personal'){
+  const income=sum('Salary')+sum('Commission')+sum('Other income');
+  const spend=sum('Expense')+sum('Subscription');
+  lines=[['Income',fmt(income)],['Spending',fmt(spend)],['Cash after spending',fmt(income-spend)],['Splurge transfers',fmt(sum('Splurge savings transfer'))],['Investment savings transfers',fmt(sum('Investment savings transfer'))],['Investment cost',fmt(sum('Investment purchase'))],['Investment latest value entries',fmt(sum('Investment current value'))]];
+ }else if(kind==='estate'){
+  const revenue=sum('Deal revenue')+sum('Commission income');
+  const costs=sum('Partner share payout')+sum('Ads')+sum('Tools')+sum('Subscriptions')+sum('Other expense');
+  lines=[['Revenue recorded',fmt(revenue)],['Costs and partner payouts',fmt(costs)],['Estimated net',fmt(revenue-costs)]];
+ }else{
+  const revenue=sum('Sale revenue');const costs=sum('Product cost')+sum('Owner salary')+sum('Ads')+sum('Packaging')+sum('Shipping')+sum('Other expense');
+  lines=[['Sales',fmt(revenue)],['Gross profit',fmt(revenue-sum('Product cost'))],['Net after recorded costs',fmt(revenue-costs)],['Reinvestment transfers',fmt(sum('Reinvestment transfer'))]];
+ }
+ return `<div class="grid-2" style="margin-bottom:12px">${lines.map(([k,v])=>`<div class="stat-card"><span class="muted text-xs">${k}</span><strong>${v}</strong></div>`).join('')}</div><p class="muted text-xs">Transfers are shown separately, not double-counted as expenses. Investment value entries are snapshots, not automatically updated market prices.</p>`;
+}
+function financeCard(kind,label,options){const items=ensureFinance()[kind], totals={};items.forEach(x=>totals[x.type]=(totals[x.type]||0)+x.amount);return `<div class="card"><p class="serif font-semibold" style="font-size:18px;margin:0 0 8px">${label}</p>${financeSummary(kind,items)}<div class="grid-2">${options.map(o=>`<div class="stat-card"><span class="muted text-xs">${o}</span><strong>₦${(totals[o]||0).toLocaleString()}</strong></div>`).join('')}</div><div class="col gap2" style="margin-top:12px"><select id="f-type-${kind}">${options.map(o=>`<option>${o}</option>`).join('')}</select><input class="input" id="f-amount-${kind}" type="number" min="1" placeholder="Amount (₦)"/><input class="input" id="f-note-${kind}" placeholder="Note (optional)"/><button class="add-btn" style="width:100%;padding:10px" onclick="addFinance('${kind}')">+ Record transaction</button></div><div class="col gap2" style="margin-top:12px">${items.slice().reverse().map(x=>`<div class="row between text-xs"><span>${x.date} · ${escapeHtml(x.type)} · ₦${x.amount.toLocaleString()} ${escapeHtml(x.note)}</span><button onclick="removeFinance('${kind}',${x.id})">✕</button></div>`).join('')}</div></div>`;}
+function renderFinanceHistory(){const kinds=[['personal','Personal'],['estate','Real estate'],['light','Light Gallery']];return `<div class="card"><p class="serif font-semibold">💰 Finance history by month</p><p class="muted text-xs">Historical transaction totals by month and business. Transfers and asset-value snapshots are listed separately; these are not automatically profit.</p>${kinds.map(([k,label])=>{const groups={};for(const x of ensureFinance()[k]||[]){const m=(x.date||'').slice(0,7);if(!m)continue;groups[m]||={count:0,types:{}};groups[m].count++;groups[m].types[x.type]=(groups[m].types[x.type]||0)+Number(x.amount||0);}return `<p class="serif font-semibold">${label}</p>${Object.entries(groups).sort((a,b)=>b[0].localeCompare(a[0])).map(([m,v])=>`<div style="margin-bottom:10px"><strong class="text-sm">${m} · ${v.count} entries</strong><p class="muted text-xs">${Object.entries(v.types).map(([type,amt])=>escapeHtml(type)+': ₦'+amt.toLocaleString()).join(' · ')}</p></div>`).join('')||'<p class="muted text-xs">No transactions recorded yet.</p>'}`}).join('')}</div>`;}
+
+function addJoy(){const el=document.getElementById('joy-note');const v=el?.value.trim();const file=document.getElementById('joy-photo')?.files[0];if(!v&&!file)return;const store=(photo='')=>{if(!data.joy)data.joy=[];data.joy.push({id:Date.now(),date:todayISO(),text:v,photo});saveData();render();};if(file){if(file.size>1200000){alert('Choose a smaller photo (under 1.2 MB) so browser storage does not fill.');return;}const reader=new FileReader();reader.onload=()=>store(reader.result);reader.readAsDataURL(file);}else store();}
+function deleteJoy(id){data.joy=(data.joy||[]).filter(x=>x.id!==id);saveData();render();}
+function renderVision(){const g=data.goals;const carPct=g.carTarget>0?Math.min(100,Math.round(g.carCurrent/g.carTarget*100)):0;return `
+ <div class="card card-gold"><p class="serif" style="font-size:22px;margin:0 0 8px">The woman I'm becoming ✨</p><p class="text-sm" style="line-height:1.7;margin:0">Grounded in Christ. Courageous in uncomfortable moments. Financially intentional. Emotionally present. Rested, nourished, and free to enjoy the life I'm building.</p><p style="color:${COLORS.rose};font-style:italic">I can work without pressure. I do my part and leave the rest to God.</p></div>
+ <div class="card"><p class="serif font-semibold" style="font-size:18px;margin:0 0 10px">🌷 Joy Jar</p><p class="muted text-xs">Collect moments, not achievements.</p><textarea id="joy-note" placeholder="A little thing that made me happy..."></textarea><input class="input" id="joy-photo" type="file" accept="image/*" style="margin-top:8px"/><p class="muted text-xs">Optional small photo. Photos use browser storage, so export backups regularly.</p><button class="add-btn" style="width:100%;padding:10px;margin-top:8px" onclick="addJoy()">+ Add a moment</button>${(data.joy||[]).slice().reverse().map(x=>`<div class="card" style="margin-top:8px"><p class="text-sm">🌸 ${escapeHtml(x.text)} <span class="muted text-xs">${x.date}</span></p>${x.photo?`<img src="${x.photo}" alt="Joy Jar memory" style="width:100%;max-height:260px;object-fit:cover;border-radius:12px"/>`:``}<button class="text-xs" onclick="deleteJoy(${x.id})">Remove</button></div>`).join('')}</div>
+ <div class="card"><p class="serif font-semibold" style="font-size:18px;margin:0 0 10px">💗 Personal savings goal</p><div class="row gap2"><input class="input" type="number" value="${g.carCurrent}" aria-label="Saved amount" oninput="onCarInput('carCurrent',this.value)"/><span>of ₦</span><input class="input" type="number" value="${g.carTarget}" aria-label="Goal amount" oninput="onCarInput('carTarget',this.value)"/></div><div class="progress" style="margin-top:12px"><div id="car-bar" class="progress-fill" style="width:${carPct}%;background:${COLORS.rose}"></div></div><span class="text-xs muted" id="car-pct">${carPct}%</span><p class="muted text-xs">Set your own target when you're ready. Saving amounts can vary.</p></div>
+ ${financeCard('personal','💗 Personal finances',['Salary','Commission','Other income','Expense','Subscription','Splurge savings transfer','Investment savings transfer','Investment purchase','Investment current value'])}
+ ${financeCard('estate','🏡 Real estate finances',['Deal revenue','Commission income','Partner share payout','Ads','Tools','Subscriptions','Other expense'])}
+ ${financeCard('light','💡 Light Gallery finances',['Sale revenue','Product cost','Reinvestment transfer','Owner salary','Ads','Packaging','Shipping','Other expense'])}
+ ${renderFinanceHistory()} ${renderBackupCard()}`;}
+
+const IDENTITY_DAYS = [
+  {
+    "name": "Spiritual Identity",
+    "title": "My Spiritual Identity",
+    "text": "I am a woman of God, a priest in my family, a carrier of the Holy Ghost, and a vessel through whom Christ is made known. My life points people toward Him. I am light, a revealer of identity, and a catalyst for meaningful intimacy with God and others. My assignment is to see His will fulfilled.\n\nI seek first God's Kingdom, His will and His way. My life is a reflection of my altar. My private devotion gives substance to my public life. I have the mind of Christ, I grow in His character, and I desire His results. I am kept under the shadow of the Most High. I speak with wisdom, faith and conviction. I walk in grace, favor, courage and peace."
+  },
+  {
+    "name": "Inner World",
+    "title": "My Inner World",
+    "text": "I know myself deeply. I recognize my emotions without surrendering authority to them. I do not rush to defend myself, prove my wealth, or seek approval. I trust my judgment, honor my convictions and communicate with clarity. I can say no without guilt. My heart is warm, but access to it is earned through trust. I guard my faith, mind and body. I function from rest, not desperation."
+  },
+  {
+    "name": "Femininity & Presence",
+    "title": "My Femininity & Presence",
+    "text": "I am a powerhouse who maintains her femininity. My authority does not erase my warmth. I am bubbly, joyful, kind, lighthearted and graceful. I laugh freely and do not make negativity my home. I care beautifully for my hygiene, health, body, mind and appearance. I am a fashion icon in my own expression. I enjoy travel, shopping, beauty and the fruit of my work. My body is worthy of respect, never sexual entitlement."
+  },
+  {
+    "name": "Mind & Character",
+    "title": "My Mind & Character",
+    "text": "I am well-read, intellectually curious, articulate and thoughtful. I acquire knowledge and apply it. I ask meaningful questions, listen carefully and speak with confidence. My word matters. My integrity matters. I have the courage to do what is necessary, even when uncomfortable. I do not merely admire potential; I develop it through discipline and action."
+  },
+  {
+    "name": "Purpose, Work & Abundance",
+    "title": "My Purpose, Work & Abundance",
+    "text": "I am a builder, a creator and a businesswoman. I create and multiply wealth by serving real needs and selling genuine value. In real estate, I serve intentional, financially capable clients with excellence and integrity. People buy through me, invest through me and recommend me because I cultivate trust, competence and meaningful relationships. The works of my hands are visible to those who need them. I believe in divine favor and speed, and I also prepare, follow up, negotiate and execute.\n\nI am financially comfortable and wise in stewardship. Money is a tool, not my identity. Like Joseph, I desire to elevate my family to a new level of financial abundance. I give generously, invest intelligently and enjoy beautiful experiences without needing to prove my worth. My success creates opportunities, lifts others and glorifies God."
+  },
+  {
+    "name": "Love & Relationships",
+    "title": "My Love & Relationships",
+    "text": "I am thoughtful, affectionate, wise and intentional in love. I desire a marriage with a man who honors God, respects my boundaries, cherishes me and delights in my happiness. I desire to be loved generously and consistently, and I bring emotional maturity, warmth, loyalty and care to that relationship. I do not confuse attention with commitment or promises with action. I love without abandoning myself."
+  },
+  {
+    "name": "The Life I Live",
+    "title": "The Life I Live",
+    "text": "My faith is visible in my obedience. My wisdom is visible in my decisions. My confidence is visible in my boundaries. My femininity is visible in my presence. My ambition is visible in my actions. My love is visible in how I treat people. I am not defined by one difficult day. I return to my convictions and keep becoming.\n\nI am a powerhouse, and I am at peace. I am a woman of substance, and I am full of light. I know whose I am. I know what I stand for. I know what I am building."
+  }
+];
+const COMPASS_DEFAULT={
+ identity:`MY IDENTITY — THE WOMAN I AM. THE WOMAN I AM BECOMING.
+
+I am a woman of God, a priest in my family, a carrier of the Holy Ghost, and a vessel through whom Christ is made known. My life points people toward Him. I am light, a revealer of identity, and a catalyst for meaningful intimacy with God and others. My assignment is to see His will fulfilled.
+
+I seek first God's Kingdom, His will and His way. My life is a reflection of my altar. My private devotion gives substance to my public life. I have the mind of Christ, I grow in His character, and I desire His results. I am kept under the shadow of the Most High. I speak with wisdom, faith and conviction. I walk in grace, favor, courage and peace.
+
+I know myself deeply. I recognize my emotions without surrendering authority to them. I do not rush to defend myself, prove my wealth, or seek approval. I trust my judgment, honor my convictions and communicate with clarity. I can say no without guilt. My heart is warm, but access to it is earned through trust. I guard my faith, mind and body. I function from rest, not desperation.
+
+I am a powerhouse who maintains her femininity. My authority does not erase my warmth. I am bubbly, joyful, kind, lighthearted and graceful. I laugh freely and do not make negativity my home. I care beautifully for my hygiene, health, body, mind and appearance. I am a fashion icon in my own expression. I enjoy travel, shopping, beauty and the fruit of my work. My body is worthy of respect, never sexual entitlement.
+
+I am well-read, intellectually curious, articulate and thoughtful. I acquire knowledge and apply it. I ask meaningful questions, listen carefully and speak with confidence. My word matters. My integrity matters. I have the courage to do what is necessary, even when uncomfortable. I do not merely admire potential; I develop it through discipline and action.
+
+I am a builder, a creator and a businesswoman. I create and multiply wealth by serving real needs and selling genuine value. In real estate, I serve intentional, financially capable clients with excellence and integrity. People buy through me, invest through me and recommend me because I cultivate trust, competence and meaningful relationships. The works of my hands are visible to those who need them. I believe in divine favor and speed, and I also prepare, follow up, negotiate and execute.
+
+I am financially comfortable and wise in stewardship. Money is a tool, not my identity. Like Joseph, I desire to elevate my family to a new level of financial abundance. I give generously, invest intelligently and enjoy beautiful experiences without needing to prove my worth. My success creates opportunities, lifts others and glorifies God.
+
+I am thoughtful, affectionate, wise and intentional in love. I desire a marriage with a man who honors God, respects my boundaries, cherishes me and delights in my happiness. I desire to be loved generously and consistently, and I bring emotional maturity, warmth, loyalty and care to that relationship. I do not confuse attention with commitment or promises with action. I love without abandoning myself.
+
+My faith is visible in my obedience. My wisdom is visible in my decisions. My confidence is visible in my boundaries. My femininity is visible in my presence. My ambition is visible in my actions. My love is visible in how I treat people. I am not defined by one difficult day. I return to my convictions and keep becoming.
+
+I am a powerhouse, and I am at peace. I am a woman of substance, and I am full of light. I know whose I am. I know what I stand for. I know what I am building.`,
+ why:`1. Like Joseph, elevate my family to a new financial level and spoil those I love.
+2. Enjoy wealth and beautiful experiences while knowing my worth does not depend on money.
+3. Be an expression and reflection of God's light so He is glorified.`,
+ priorities:`1. God — my faith
+2. My purpose
+3. Me
+4. My family and friends
+5. The people I need to help`,
+ values:`1. God is involved in all I do and all that happens to me.
+2. The Bible is the truth.
+3. Constant growth through acquiring and applying knowledge.
+4. Good, active communication.
+5. I trust myself, listen to myself and take care of myself.
+6. Positive perspective and self-talk.
+7. Courageously doing and saying what is necessary.
+8. Spiritual power and authority.
+9. Kindness and love toward everyone.
+10. Integrity in business.
+11. A good name.
+12. Confidence in myself and my abilities.
+13. Giving and helping.`,
+ boundaries:`1. No sexual advances or sexual jokes from non-romantic partners.
+2. Non-romantic partners respect my personal space, keeping at least two feet away from my body.
+3. No holding hands with non-romantic partners.
+4. Walk away when disrespected.
+5. Every meeting has a clearly stated objective; protect my time.
+6. No romantic relationships with business partners.
+7. I do not share personal items with anyone outside family.
+8. No oversharing of growth progress.
+9. Lend money no more than once monthly.`
+};
+for(const [k,v] of Object.entries(COMPASS_DEFAULT)){if(data.compass[k]===undefined)data.compass[k]=v;}saveData();
+function saveCompass(k,v){data.compass[k]=v;saveData();}
+function identityText(i){return data.compass.identityDays?.[i]??IDENTITY_DAYS[i].text;}
+function saveIdentityDay(i,value){
+  data.compass.identityDays ||= {};
+  data.compass.identityDays[i]=value;
+  saveData();
+}
+function setIdentityDay(i){data.compass.selectedIdentityDay=i;saveData();render();}
+function identityDayPanel(){
+  const today=new Date().getDay();
+  const chosen=Number.isInteger(data.compass.selectedIdentityDay)?data.compass.selectedIdentityDay:today;
+  const i=(chosen>=0&&chosen<7)?chosen:today;
+  return `<div class="card">
+    <p class="serif" style="font-size:20px;margin:0 0 6px">✨ My Identity</p>
+    <p class="muted text-sm">Seven declarations, one for each day. Select a day to read or edit its statement.</p>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin:12px 0">
+    ${IDENTITY_DAYS.map((d,n)=>`<button type="button" class="icon-btn" style="width:auto;height:auto;min-height:44px;padding:8px;border-radius:10px;${i===n?'border:1px solid var(--gold, #bba46b);':''}" onclick="setIdentityDay(${n})">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][n]} · ${escapeHtml(d.name)}</button>`).join('')}
+    </div>
+    <p class="serif font-semibold" style="font-size:18px">${escapeHtml(IDENTITY_DAYS[i].title)}</p>
+    <p class="muted text-xs">Read this morning and tonight. You can edit this day's declaration below.</p>
+    <textarea class="compass-text" rows="18" oninput="saveIdentityDay(${i},this.value)">${escapeHtml(identityText(i))}</textarea>
+    </div>`;
+}
+function dailyIdentityReminder(){
+  const i=parseISO(selectedDate).getDay();
+  return `<div class="card card-gold" style="margin:10px 0">
+    <p class="serif font-semibold" style="font-size:17px;margin:0 0 6px">🌅 Morning & 🌙 Night · Today's identity</p>
+    <p class="text-sm" style="margin:0 0 7px"><strong>${escapeHtml(IDENTITY_DAYS[i].title)}</strong> — ${escapeHtml(DAY[i])}</p>
+    <details><summary class="text-sm" style="cursor:pointer">Read today's declaration</summary>
+      <div style="white-space:pre-wrap;line-height:1.75;margin-top:12px">${escapeHtml(identityText(i))}</div>
+    </details>
+    <p class="muted text-xs">Only today's declaration. Read it once in the morning and again at night.</p>
+  </div>`;
+}
+function renderCompass(){
+ const labels=[['why','🔥 My Why'],['priorities','🧭 My Priorities'],['values','💎 My Values'],['boundaries','🛡️ My Boundaries']];
+ return `<div class="card card-gold"><p class="serif" style="font-size:23px;margin:0 0 8px">My Compass 🧭</p><p class="muted text-sm">A place to return to who you are, what matters, and how you choose to live.</p><p class="serif" style="line-height:1.6">${escapeHtml(data.compass.reminder||'I know whose I am. I know what I stand for. I know what I am building.')}</p><input class="input" placeholder="Remember Today — pin a short declaration" value="${escapeHtml(data.compass.reminder||'')}" oninput="saveCompass('reminder',this.value)"></div>
+ ${identityDayPanel()}
+ ${labels.map(([k,label])=>`<details class="card"><summary class="serif font-semibold" style="cursor:pointer">${label}</summary><p class="muted text-xs">Editable · saved on this device</p><textarea class="compass-text" rows="9" oninput="saveCompass('${k}',this.value)">${escapeHtml(data.compass[k]??COMPASS_DEFAULT[k])}</textarea></details>`).join('')}`;
+}
+
+
+/* VIDEO OF THE WEEK — optional learning, independent of completion scores */
+function videoWeekKey(){return getMonday(todayISO());}
+function videoRecord(){
+  data.videoWeeks ||= {};
+  return data.videoWeeks[videoWeekKey()] ||= {url:'',title:'',lesson:'',practice:'',watched:false,revisited:false,applied:false,reflection:''};
+}
+function saveVideoField(field,value){
+  videoRecord()[field]=value;
+  saveData();
+}
+function toggleVideoStep(field,checked){
+  saveVideoField(field,checked);
+  render();
+}
+function renderVideoOfWeek(){
+  const v=videoRecord(), week=videoWeekKey();
+  const url=String(v.url||'').trim();
+  const valid=/^https:\/\/(www\.)?(youtube\.com|youtu\.be)\//i.test(url);
+  return `<div class="card" style="margin-top:14px">
+    <p class="serif font-semibold" style="font-size:20px;margin-bottom:4px">🎬 Video of the Week</p>
+    <p class="muted text-xs">One video, one lesson, one real-life application. Optional — never affects your completion score.</p>
+    <p class="muted text-xs">Week of ${escapeHtml(shortDate(week))}</p>
+    <label class="text-xs muted">Video title<input class="input" placeholder="What are you learning?" value="${escapeHtml(v.title)}" oninput="saveVideoField('title',this.value)"></label>
+    <label class="text-xs muted">YouTube link<input class="input" type="url" placeholder="https://youtube.com/watch?v=..." value="${escapeHtml(v.url)}" oninput="saveVideoField('url',this.value)"></label>
+    ${valid?`<p><a href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer">▶ Open this week's video ↗</a></p>`:''}
+    <label class="text-xs muted">One key lesson<textarea rows="2" placeholder="What idea matters most?" oninput="saveVideoField('lesson',this.value)">${escapeHtml(v.lesson)}</textarea></label>
+    <label class="text-xs muted">One practical action<textarea rows="2" placeholder="How will I use it this week?" oninput="saveVideoField('practice',this.value)">${escapeHtml(v.practice)}</textarea></label>
+    <div style="display:flex;flex-direction:column;gap:10px;margin:10px 0">
+      ${[['watched','Watched attentively'],['revisited','Revisited the useful parts'],['applied','Practiced in real life']].map(([key,label])=>`<label class="text-sm"><input type="checkbox" ${v[key]?'checked':''} onchange="toggleVideoStep('${key}',this.checked)"> ${label}</label>`).join('')}
+    </div>
+    <label class="text-xs muted">Weekly reflection<textarea rows="2" placeholder="What changed because I practiced?" oninput="saveVideoField('reflection',this.value)">${escapeHtml(v.reflection)}</textarea></label>
+    <p class="muted text-xs">Saved by week. Previous weeks remain in your exported OS backup.</p>
+  </div>`;
+}
+
+/* ===================== NAV + MAIN RENDER ===================== */
+function renderNav(){
+  const tabs=[['today','Today','☀️'],['week','Week','📅'],['growth','Growth','📊'],['vision','Vision','✨'],['compass','Compass','🧭']];
+  return `<div class="nav">${tabs.map(([id,label,emoji])=>`
+    <button class="nav-item ${activeTab===id?'active':''}" onclick="setTab('${id}')">
+      <span class="emoji">${emoji}</span><span>${label}</span>
+    </button>`).join('')}</div>`;
+}
+function render(){
+  const app=document.getElementById('app');
+  let content='';
+  if(activeTab==='today') content=dailyIdentityReminder()+renderToday();
+  else if(activeTab==='week') content=renderWeek();
+  else if(activeTab==='growth') content=renderGrowth()+renderVideoOfWeek();
+  else if(activeTab==='compass') content=renderCompass();
+  else content=renderVision();
+  app.innerHTML = `
+    <div class="header">
+      <p class="brand serif">✿ Becoming OS</p>
+      <p class="tagline">Rooted in grace. Growing in joy. · Saved on this device</p>
+    </div>
+    <div class="main">${content}</div>
+    ${renderNav()}`;
+}
+render();
+</script>
+</body>
+</html>
